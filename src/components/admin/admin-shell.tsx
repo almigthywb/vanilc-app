@@ -98,7 +98,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           return (
             <Link
               key={to}
-              to={to}
+              to={to as never}
               onClick={() => setOpen(false)}
               className={[
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
