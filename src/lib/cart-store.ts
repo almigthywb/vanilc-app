@@ -88,6 +88,8 @@ export const cart = {
   },
 };
 
+const EMPTY_LIST: CartItem[] = [];
+
 export function useCart(): CartItem[] {
   return useSyncExternalStore(
     (cb) => {
@@ -96,7 +98,7 @@ export function useCart(): CartItem[] {
       return () => listeners.delete(cb);
     },
     () => items,
-    () => [],
+    () => EMPTY_LIST,
   );
 }
 
