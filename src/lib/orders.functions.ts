@@ -22,24 +22,11 @@ const CreateOrderSchema = z.object({
   items: z.array(CartItemSchema).min(1).max(50),
 });
 
-function getPublicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    {
-      auth: {
-        storage: undefined,
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    },
-  );
-}
-
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => CreateOrderSchema.parse(input))
   .handler(async ({ data }) => {
-    const supabase = getPublicClient();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = supabaseAdmin;
 
     // Load settings to compute delivery fee + verify store open
     const { data: settings, error: sErr } = await supabase
