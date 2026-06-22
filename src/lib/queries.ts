@@ -1,0 +1,86 @@
+import { queryOptions } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  image_url: string | null;
+  sort_order: number;
+  active: boolean;
+}
+
+export interface Product {
+  id: string;
+  category_id: string | null;
+  name: string;
+  description: string | null;
+  price: number;
+  promo_price: number | null;
+  is_promo: boolean;
+  image_url: string | null;
+  available: boolean;
+  is_featured: boolean;
+  sort_order: number;
+  weight_label: string | null;
+}
+
+export interface Settings {
+  id: number;
+  store_open: boolean;
+  whatsapp_number: string;
+  delivery_fee_city: number;
+  delivery_fee_outside: number;
+  prep_time_min: number;
+  prep_time_max: number;
+  address: string | null;
+  business_hours: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+}
+
+export const categoriesQuery = queryOptions({
+  queryKey: ["categories"],
+  queryFn: async (): Promise<Category[]> => {
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order");
+    if (error) throw error;
+    return (data ?? []) as Category[];
+  },
+});
+
+export const productsQuery = queryOptions({
+  queryKey: ["products"],
+  queryFn: async (): Promise<Product[]> => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("sort_order");
+    if (error) throw error;
+    return (data ?? []).map((p) => ({
+      ...p,
+      price: Number(p.price),
+      promo_price: p.promo_price !== null ? Number(p.promo_price) : null,
+    })) as Product[];
+  },
+});
+
+export const settingsQuery = queryOptions({
+  queryKey: ["settings"],
+  queryFn: async (): Promise<Settings> => {
+    const { data, error } = await supabase
+      .from("settings")
+      .select("*")
+      .eq("id", 1)
+      .single();
+    if (error) throw error;
+    return {
+      ...data,
+      delivery_fee_city: Number(data.delivery_fee_city),
+      delivery_fee_outside: Number(data.delivery_fee_outside),
+    } as Settings;
+  },
+});
