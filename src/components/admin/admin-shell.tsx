@@ -25,7 +25,7 @@ import { getCurrentRole, claimFirstAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
-const NAV = [
+const NAV: Array<{ to: string; label: string; Icon: React.ComponentType<{ className?: string }>; exact?: boolean }> = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
   { to: "/admin/pedidos", label: "Pedidos", Icon: ShoppingBag },
   { to: "/admin/produtos", label: "Produtos", Icon: Beef },
@@ -33,7 +33,7 @@ const NAV = [
   { to: "/admin/clientes", label: "Clientes", Icon: Users },
   { to: "/admin/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/admin/configuracoes", label: "Configurações", Icon: Settings },
-] as const;
+];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
