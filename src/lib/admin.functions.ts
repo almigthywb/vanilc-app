@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 // Returns whether the current authenticated user is admin.
 export const getCurrentRole = createServerFn({ method: "GET" })
@@ -36,7 +38,7 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
 
 const GrantAdmin = z.object({ email: z.string().email() });
 
-const requireAdmin = async (supabase: Parameters<Parameters<typeof createServerFn>[0]>[0] extends never ? never : any, userId: string) => {
+const requireAdmin = async (supabase: SupabaseClient<Database>, userId: string) => {
   const { data: roles, error } = await supabase
     .from("user_roles")
     .select("role")
