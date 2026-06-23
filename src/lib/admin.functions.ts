@@ -36,17 +36,46 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
 
 const GrantAdmin = z.object({ email: z.string().email() });
 
+const requireAdmin = async (supabase: Parameters<Parameters<typeof createServerFn>[0]>[0] extends never ? never : any, userId: string) => {
+  const { data: roles, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin");
+  if (error) throw new Error(error.message);
+  if (!roles || roles.length === 0) throw new Error("Acesso negado.");
+};
+
+const ProductInput = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1),
+  description: z.string().nullable(),
+  price: z.number().nonnegative(),
+  category_id: z.string().uuid().nullable(),
+  image_url: z.string().nullable(),
+  available: z.boolean(),
+  is_featured: z.boolean(),
+  is_promo: z.boolean(),
+  promo_price: z.number().nonnegative().nullable(),
+  weight_label: z.string().nullable(),
+});
+
+const CategoryInput = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  sort_order: z.number().int(),
+  active: z.boolean(),
+});
+
+const DeleteInput = z.object({ id: z.string().uuid() });
+
 export const grantAdminByEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => GrantAdmin.parse(d))
   .handler(async ({ data, context }) => {
     // Caller must be admin
-    const { data: roles } = await context.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin");
-    if (!roles || roles.length === 0) throw new Error("Acesso negado.");
+    await requireAdmin(context.supabase, context.userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Look up user by email via admin API
@@ -61,4 +90,56 @@ export const grantAdminByEmail = createServerFn({ method: "POST" })
       .insert({ user_id: target.id, role: "admin" });
     if (error) throw new Error(error.message);
     return { granted: true };
+  });
+
+export const saveAdminProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ProductInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { id, ...payload } = data;
+    const query = id
+      ? supabaseAdmin.from("products").update(payload).eq("id", id)
+      : supabaseAdmin.from("products").insert(payload);
+    const { error } = await query;
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteAdminProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => DeleteInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("products").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const saveAdminCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => CategoryInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { id, ...payload } = data;
+    const query = id
+      ? supabaseAdmin.from("categories").update(payload).eq("id", id)
+      : supabaseAdmin.from("categories").insert(payload);
+    const { error } = await query;
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteAdminCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => DeleteInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("categories").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
