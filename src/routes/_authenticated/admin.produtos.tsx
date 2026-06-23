@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Plus, Trash2, X, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatKwanza } from "@/lib/format";
 import { resolveProductImage } from "@/lib/product-images";
+import { deleteAdminProduct, saveAdminProduct } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/produtos")({
@@ -42,6 +44,7 @@ const EMPTY: ProductForm = {
 function ProductsPage() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<ProductForm | null>(null);
+  const deleteProduct = useServerFn(deleteAdminProduct);
 
   const products = useQuery({
     queryKey: ["admin-products"],
@@ -60,8 +63,7 @@ function ProductsPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("products").delete().eq("id", id);
-      if (error) throw error;
+      await deleteProduct({ data: { id } });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
@@ -162,6 +164,7 @@ function ProductModal({
   const [f, setF] = useState<ProductForm>(initial);
   const [uploading, setUploading] = useState(false);
   const queryClient = useQueryClient();
+  const saveProduct = useServerFn(saveAdminProduct);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -178,11 +181,9 @@ function ProductModal({
         weight_label: f.weight_label || null,
       };
       if (f.id) {
-        const { error } = await supabase.from("products").update(payload).eq("id", f.id);
-        if (error) throw error;
+        await saveProduct({ data: { id: f.id, ...payload } });
       } else {
-        const { error } = await supabase.from("products").insert(payload);
-        if (error) throw error;
+        await saveProduct({ data: payload });
       }
     },
     onSuccess: () => {
