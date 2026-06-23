@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Plus, Trash2, Pencil, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { deleteAdminCategory, saveAdminCategory } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/categorias")({
@@ -21,6 +23,8 @@ interface CatForm {
 function CategoriesPage() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<CatForm | null>(null);
+  const saveCategory = useServerFn(saveAdminCategory);
+  const deleteCategory = useServerFn(deleteAdminCategory);
 
   const cats = useQuery({
     queryKey: ["admin-categories"],
@@ -34,11 +38,9 @@ function CategoriesPage() {
     mutationFn: async (c: CatForm) => {
       const payload = { name: c.name, slug: c.slug, sort_order: c.sort_order, active: c.active };
       if (c.id) {
-        const { error } = await supabase.from("categories").update(payload).eq("id", c.id);
-        if (error) throw error;
+        await saveCategory({ data: { id: c.id, ...payload } });
       } else {
-        const { error } = await supabase.from("categories").insert(payload);
-        if (error) throw error;
+        await saveCategory({ data: payload });
       }
     },
     onSuccess: () => {
@@ -52,8 +54,7 @@ function CategoriesPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("categories").delete().eq("id", id);
-      if (error) throw error;
+      await deleteCategory({ data: { id } });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
