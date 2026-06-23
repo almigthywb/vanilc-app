@@ -70,8 +70,28 @@ export const productsQuery = queryOptions({
   },
 });
 
+const SETTINGS_PUBLIC_COLUMNS =
+  "id, store_open, delivery_fee_city, delivery_fee_outside, prep_time_min, prep_time_max, address, business_hours, logo_url, banner_url";
+
 export const settingsQuery = queryOptions({
   queryKey: ["settings"],
+  queryFn: async (): Promise<Settings> => {
+    const { data, error } = await supabase
+      .from("settings")
+      .select(SETTINGS_PUBLIC_COLUMNS)
+      .eq("id", 1)
+      .single();
+    if (error) throw error;
+    return {
+      ...data,
+      delivery_fee_city: Number(data.delivery_fee_city),
+      delivery_fee_outside: Number(data.delivery_fee_outside),
+    } as Settings;
+  },
+});
+
+export const adminSettingsQuery = queryOptions({
+  queryKey: ["settings", "admin"],
   queryFn: async (): Promise<Settings> => {
     const { data, error } = await supabase
       .from("settings")
@@ -86,3 +106,4 @@ export const settingsQuery = queryOptions({
     } as Settings;
   },
 });
+
