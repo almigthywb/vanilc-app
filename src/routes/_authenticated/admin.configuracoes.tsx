@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Save, Phone, MapPin, Clock, Truck, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { settingsQuery, type Settings } from "@/lib/queries";
+import { adminSettingsQuery, type Settings } from "@/lib/queries";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
 
 function SettingsPage() {
   const queryClient = useQueryClient();
-  const { data } = useQuery(settingsQuery);
+  const { data } = useQuery(adminSettingsQuery);
+
   const [s, setS] = useState<Settings | null>(null);
 
   useEffect(() => {

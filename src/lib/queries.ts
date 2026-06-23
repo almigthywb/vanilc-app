@@ -28,7 +28,8 @@ export interface Product {
 export interface Settings {
   id: number;
   store_open: boolean;
-  whatsapp_number: string;
+  /** Only visible to admin users; absent for anonymous visitors. */
+  whatsapp_number?: string;
   delivery_fee_city: number;
   delivery_fee_outside: number;
   prep_time_min: number;
@@ -38,6 +39,7 @@ export interface Settings {
   logo_url: string | null;
   banner_url: string | null;
 }
+
 
 export const categoriesQuery = queryOptions({
   queryKey: ["categories"],
@@ -68,8 +70,28 @@ export const productsQuery = queryOptions({
   },
 });
 
+const SETTINGS_PUBLIC_COLUMNS =
+  "id, store_open, delivery_fee_city, delivery_fee_outside, prep_time_min, prep_time_max, address, business_hours, logo_url, banner_url";
+
 export const settingsQuery = queryOptions({
   queryKey: ["settings"],
+  queryFn: async (): Promise<Settings> => {
+    const { data, error } = await supabase
+      .from("settings")
+      .select(SETTINGS_PUBLIC_COLUMNS)
+      .eq("id", 1)
+      .single();
+    if (error) throw error;
+    return {
+      ...data,
+      delivery_fee_city: Number(data.delivery_fee_city),
+      delivery_fee_outside: Number(data.delivery_fee_outside),
+    } as Settings;
+  },
+});
+
+export const adminSettingsQuery = queryOptions({
+  queryKey: ["settings", "admin"],
   queryFn: async (): Promise<Settings> => {
     const { data, error } = await supabase
       .from("settings")
@@ -84,3 +106,4 @@ export const settingsQuery = queryOptions({
     } as Settings;
   },
 });
+
