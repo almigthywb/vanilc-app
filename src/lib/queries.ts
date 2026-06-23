@@ -28,7 +28,8 @@ export interface Product {
 export interface Settings {
   id: number;
   store_open: boolean;
-  whatsapp_number: string;
+  /** Only visible to admin users; absent for anonymous visitors. */
+  whatsapp_number?: string;
   delivery_fee_city: number;
   delivery_fee_outside: number;
   prep_time_min: number;
@@ -38,6 +39,7 @@ export interface Settings {
   logo_url: string | null;
   banner_url: string | null;
 }
+
 
 export const categoriesQuery = queryOptions({
   queryKey: ["categories"],
