@@ -77,15 +77,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vanilc Churrascaria — Delivery de churrasco" },
+      { title: "Churrasqueira Vanilc - O sabor na palma da sua mão" },
       {
         name: "description",
         content:
           "O melhor churrasco entregue na sua casa. Picanha, costela, combos e mais. Peça pelo Vanilc.",
       },
-      { property: "og:title", content: "Vanilc Churrascaria" },
-      { property: "og:description", content: "Churrasco premium entregue na sua casa." },
+      { property: "og:title", content: "Churrasqueira Vanilc - O sabor na palma da sua mão" },
+      { property: "og:description", content: "O melhor sabor do churrasco, na palma da sua mão." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Churrasqueira Vanilc - O sabor na palma da sua mão" },
+      { name: "description", content: "O melhor sabor do churrasco, na palma da sua mão." },
+      { name: "twitter:description", content: "O melhor sabor do churrasco, na palma da sua mão." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/qPkSRWure9VVsrxyvItSo6aKZy23/social-images/social-1782177389957-b49ea406-8b3e-4cf7-84d3-064bacfaeee0.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/qPkSRWure9VVsrxyvItSo6aKZy23/social-images/social-1782177389957-b49ea406-8b3e-4cf7-84d3-064bacfaeee0.webp" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
