@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "./site-header";
+import { SiteFooter } from "./site-footer";
 import { CategorySidebar } from "./category-sidebar";
 import { CartDrawer } from "./cart-drawer";
 import { categoriesQuery, settingsQuery } from "@/lib/queries";
@@ -32,6 +33,8 @@ export function CustomerShell({ children }: { children: ReactNode }) {
         />
         <main className="min-w-0 flex-1 p-3 sm:p-6">{children}</main>
       </div>
+
+      <SiteFooter />
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} settings={settings} />
       <Toaster position="top-center" />

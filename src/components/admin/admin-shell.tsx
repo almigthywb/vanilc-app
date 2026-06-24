@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import logo from "@/assets/vanilc-logo.png";
+import { SiteFooter } from "@/components/site/site-footer";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { settingsQuery } from "@/lib/queries";
@@ -89,8 +90,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const sidebarContent = (
     <>
-      <div className="flex items-center gap-2 border-b border-border p-4">
-        <img src={logo} alt="Vanilc" className="h-12 w-auto" />
+      <div className="flex items-center justify-center border-b border-border p-4">
+        <img src={logo} alt="Vanilc" className="h-16 w-auto" />
       </div>
       <nav className="flex-1 space-y-1 p-3">
         {NAV.map(({ to, label, Icon, exact }) => {
@@ -189,6 +190,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         )}
 
         <main className="p-4 sm:p-6">{isAdmin ? children : null}</main>
+        <SiteFooter />
       </div>
       <Toaster position="top-center" />
     </div>
