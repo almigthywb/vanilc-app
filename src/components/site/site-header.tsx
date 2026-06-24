@@ -17,7 +17,58 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
-      <div className="mx-auto grid h-24 max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-3 px-3 sm:flex sm:h-24 sm:px-6">
+      {/* Mobile layout: 3-col grid with logo perfectly centered */}
+      <div className="mx-auto grid h-24 max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:hidden">
+        <div className="flex justify-start">
+          <button
+            type="button"
+            onClick={onOpenMenu}
+            className="grid h-10 w-10 place-items-center rounded-md text-foreground hover:bg-muted"
+            aria-label="Abrir menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
+
+        <Link to="/" className="flex justify-center">
+          <img
+            src={logo}
+            alt="Vanilc Churrascaria"
+            className="h-16 w-auto"
+            width={240}
+            height={160}
+          />
+        </Link>
+
+        <div className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            onClick={() => setSearchOpen((v) => !v)}
+            className="grid h-10 w-10 place-items-center rounded-md text-foreground hover:bg-muted"
+            aria-label="Buscar"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+          <Button
+            type="button"
+            onClick={onOpenCart}
+            variant="default"
+            size="lg"
+            className="relative h-11 rounded-full px-3 font-bold"
+            aria-label="Carrinho"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {count > 0 && (
+              <span className="ml-1 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary">
+                {count}
+              </span>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop / tablet layout */}
+      <div className="mx-auto hidden h-24 max-w-[1600px] items-center gap-3 px-3 sm:flex sm:px-6">
         <button
           type="button"
           onClick={onOpenMenu}
@@ -27,11 +78,11 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
           <Menu className="h-5 w-5" />
         </button>
 
-        <Link to="/" className="flex justify-center sm:shrink-0 sm:justify-start">
+        <Link to="/" className="shrink-0">
           <img
             src={logo}
             alt="Vanilc Churrascaria"
-            className="h-16 w-auto sm:h-20"
+            className="h-20 w-auto"
             width={240}
             height={160}
           />
@@ -45,7 +96,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
           </div>
         </div>
 
-        <div className="ml-auto flex flex-1 items-center justify-end gap-1 sm:gap-3">
+        <div className="ml-auto flex flex-1 items-center justify-end gap-3">
           <div className="hidden flex-1 max-w-xl md:block">
             <div className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -56,15 +107,6 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
               />
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center rounded-md text-foreground hover:bg-muted md:hidden"
-            aria-label="Buscar"
-          >
-            <Search className="h-5 w-5" />
-          </button>
 
           <Link
             to="/auth"
@@ -84,10 +126,10 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
             onClick={onOpenCart}
             variant="default"
             size="lg"
-            className="relative h-12 rounded-full px-4 sm:px-6 font-bold"
+            className="relative h-12 rounded-full px-6 font-bold"
           >
             <ShoppingCart className="h-5 w-5" />
-            <span className="hidden sm:inline ml-2">Carrinho</span>
+            <span className="ml-2">Carrinho</span>
             {count > 0 && (
               <span className="ml-2 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary">
                 {count}
@@ -98,7 +140,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
       </div>
 
       {searchOpen && (
-        <div className="border-t border-border bg-card px-3 py-3 md:hidden">
+        <div className="border-t border-border bg-card px-3 py-3 sm:hidden">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
