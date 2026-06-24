@@ -17,7 +17,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
-      <div className="mx-auto flex h-20 max-w-[1600px] items-center gap-3 px-3 sm:px-6">
+      <div className="mx-auto grid h-24 max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-3 px-3 sm:flex sm:h-24 sm:px-6">
         <button
           type="button"
           onClick={onOpenMenu}
@@ -27,11 +27,11 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
           <Menu className="h-5 w-5" />
         </button>
 
-        <Link to="/" className="shrink-0">
+        <Link to="/" className="flex justify-center sm:shrink-0 sm:justify-start">
           <img
             src={logo}
             alt="Vanilc Churrascaria"
-            className="h-14 w-auto sm:h-16"
+            className="h-16 w-auto sm:h-20"
             width={240}
             height={160}
           />
