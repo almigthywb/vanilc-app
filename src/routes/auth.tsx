@@ -45,10 +45,11 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex flex-1 items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-6 flex flex-col items-center">
-          <img src={logo} alt="Vanilc" className="h-20 w-auto" />
+          <img src={logo} alt="Vanilc" className="h-28 w-auto sm:h-32" />
         </Link>
         <div className="rounded-3xl border border-border bg-card p-8 shadow-card">
           <div className="mb-6 flex items-center gap-2">
