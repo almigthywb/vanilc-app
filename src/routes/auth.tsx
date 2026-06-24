@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import logo from "@/assets/vanilc-logo.png";
+import { SiteFooter } from "@/components/site/site-footer";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Entrar — Vanilc Admin" }] }),
@@ -133,6 +134,9 @@ function AuthPage() {
           ← Voltar ao site
         </Link>
       </div>
+      </div>
+      <SiteFooter />
     </div>
   );
+
 }

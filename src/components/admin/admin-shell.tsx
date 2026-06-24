@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import logo from "@/assets/vanilc-logo.png";
+import { SiteFooter } from "@/components/site/site-footer";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { settingsQuery } from "@/lib/queries";
@@ -189,6 +190,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         )}
 
         <main className="p-4 sm:p-6">{isAdmin ? children : null}</main>
+        <SiteFooter />
       </div>
       <Toaster position="top-center" />
     </div>
