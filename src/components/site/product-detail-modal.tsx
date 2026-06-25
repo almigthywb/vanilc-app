@@ -46,7 +46,6 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
             ? "h-[100dvh] w-screen max-w-none rounded-none"
             : "w-[92vw] max-w-[900px] rounded-3xl",
         )}
-        showCloseButton={false}
       >
         <DialogTitle className="sr-only">{product.name}</DialogTitle>
         <DialogDescription className="sr-only">
