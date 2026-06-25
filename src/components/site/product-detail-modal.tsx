@@ -107,7 +107,7 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
               )}
             </div>
 
-            {/* Info */}
+            {/* Info (scrollable) */}
             <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-5 sm:p-8">
               {category && (
                 <p className="text-xs font-semibold uppercase tracking-wider text-primary">
@@ -138,8 +138,9 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                 </span>
               </div>
 
-              <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row">
-                {!isMobile && (
+              {/* Desktop-only inline actions */}
+              {!isMobile && (
+                <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => onOpenChange(false)}
@@ -148,18 +149,33 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                     <X className="h-4 w-4" />
                     Fechar
                   </button>
-                )}
+                  <button
+                    type="button"
+                    onClick={handleAdd}
+                    disabled={!product.available}
+                    className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-flame transition hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    Adicionar ao carrinho
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile sticky footer with CTA */}
+            {isMobile && (
+              <div className="shrink-0 border-t border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <button
                   type="button"
                   onClick={handleAdd}
                   disabled={!product.available}
-                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-flame transition hover:bg-primary/90 disabled:opacity-50"
+                  className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3 text-base font-bold text-primary-foreground shadow-flame transition hover:bg-primary/90 disabled:opacity-50"
                 >
                   <ShoppingCart className="h-5 w-5" />
                   Adicionar ao carrinho
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
