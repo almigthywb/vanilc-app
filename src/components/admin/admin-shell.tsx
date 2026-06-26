@@ -15,8 +15,10 @@ import {
   PowerOff,
   ShieldAlert,
   Menu,
+  ShieldCheck,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/vanilc-logo.png";
 import { SiteFooter } from "@/components/site/site-footer";
 import { supabase } from "@/integrations/supabase/client";
