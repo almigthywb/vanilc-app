@@ -134,7 +134,11 @@ function AuthPage() {
                 <input
                   required
                   type="email"
-                  autoComplete="email"
+                  name="vanilc-admin-email"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-xl border border-border bg-card pl-10 pr-3 py-2.5 text-sm outline-none focus:border-primary"
@@ -151,7 +155,11 @@ function AuthPage() {
                   required
                   minLength={6}
                   type="password"
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  name="vanilc-admin-password"
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-border bg-card pl-10 pr-3 py-2.5 text-sm outline-none focus:border-primary"
