@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { Flame, Mail, Lock } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Flame, Mail, Lock, AlertTriangle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,12 +17,27 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
   const isLoading = useRouterState({ select: (s) => s.isLoading });
+
+  useEffect(() => {
+    return () => {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    };
+  }, []);
+
+  const showAuthError = () => {
+    setAuthError("err");
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = setTimeout(() => setAuthError(null), 3000);
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAuthError(null);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -32,12 +47,18 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Conta criada! Você está autenticado.");
+        navigate({ to: "/admin" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          setEmail("");
+          setPassword("");
+          showAuthError();
+          return;
+        }
         toast.success("Bem-vindo!");
+        navigate({ to: "/admin" });
       }
-      navigate({ to: "/admin" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro");
     } finally {
