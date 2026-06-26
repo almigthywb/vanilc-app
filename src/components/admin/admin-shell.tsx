@@ -160,7 +160,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <Button
               variant={storeOpen ? "default" : "outline"}
               size="sm"
@@ -174,6 +174,25 @@ export function AdminShell({ children }: { children: ReactNode }) {
               {storeOpen ? <Power className="mr-2 h-4 w-4" /> : <PowerOff className="mr-2 h-4 w-4" />}
               {storeOpen ? "Aberto" : "Fechado"}
             </Button>
+
+            {user && (
+              <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-2.5 py-1.5 shadow-sm sm:px-3 sm:py-2">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-sm">
+                  <span className="text-sm font-bold">
+                    {(user.email ?? "A").charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="hidden min-w-0 flex-col leading-tight sm:flex">
+                  <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <ShieldCheck className="h-3 w-3 text-primary" />
+                    Administrador
+                  </span>
+                  <span className="max-w-[180px] truncate text-sm font-semibold text-foreground lg:max-w-[240px]">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
