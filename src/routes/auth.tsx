@@ -104,6 +104,21 @@ function AuthPage() {
             ))}
           </div>
 
+          {authError && mode === "signin" && (
+            <div
+              role="alert"
+              className="mb-3 flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-red-800 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
+            >
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">Não foi possível entrar</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-red-700/90 dark:text-red-300/90">
+                  E-mail ou palavra-passe incorretos. Verifique as suas credenciais e tente novamente.
+                </p>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={onSubmit} className="space-y-3">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
