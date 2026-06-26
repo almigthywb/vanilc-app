@@ -122,7 +122,9 @@ function AuthPage() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="space-y-3">
+          <form onSubmit={onSubmit} className="space-y-3" autoComplete="off">
+            <input type="text" name="prevent-autofill" autoComplete="off" className="hidden" tabIndex={-1} aria-hidden="true" />
+            <input type="password" name="prevent-autofill-pw" autoComplete="new-password" className="hidden" tabIndex={-1} aria-hidden="true" />
             <label className="block">
               <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 E-mail
