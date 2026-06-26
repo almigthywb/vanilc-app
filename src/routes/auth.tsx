@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { Flame, Mail, Lock } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Flame, Mail, Lock, AlertTriangle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,12 +17,27 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
   const isLoading = useRouterState({ select: (s) => s.isLoading });
+
+  useEffect(() => {
+    return () => {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    };
+  }, []);
+
+  const showAuthError = () => {
+    setAuthError("err");
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = setTimeout(() => setAuthError(null), 3000);
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAuthError(null);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -32,12 +47,18 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Conta criada! Você está autenticado.");
+        navigate({ to: "/admin" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          setEmail("");
+          setPassword("");
+          showAuthError();
+          return;
+        }
         toast.success("Bem-vindo!");
+        navigate({ to: "/admin" });
       }
-      navigate({ to: "/admin" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro");
     } finally {
@@ -83,6 +104,21 @@ function AuthPage() {
             ))}
           </div>
 
+          {authError && mode === "signin" && (
+            <div
+              role="alert"
+              className="mb-3 flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-red-800 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
+            >
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold">Não foi possível entrar</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-red-700/90 dark:text-red-300/90">
+                  E-mail ou palavra-passe incorretos. Verifique as suas credenciais e tente novamente.
+                </p>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={onSubmit} className="space-y-3">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -122,7 +158,16 @@ function AuthPage() {
               disabled={loading || isLoading}
               className="h-12 w-full text-base font-bold"
             >
-              {loading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Criar conta"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {mode === "signin" ? "A iniciar sessão..." : "A criar conta..."}
+                </>
+              ) : mode === "signin" ? (
+                "Entrar"
+              ) : (
+                "Criar conta"
+              )}
             </Button>
           </form>
 
