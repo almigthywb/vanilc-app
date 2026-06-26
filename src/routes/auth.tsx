@@ -158,7 +158,16 @@ function AuthPage() {
               disabled={loading || isLoading}
               className="h-12 w-full text-base font-bold"
             >
-              {loading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Criar conta"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {mode === "signin" ? "A iniciar sessão..." : "A criar conta..."}
+                </>
+              ) : mode === "signin" ? (
+                "Entrar"
+              ) : (
+                "Criar conta"
+              )}
             </Button>
           </form>
 
