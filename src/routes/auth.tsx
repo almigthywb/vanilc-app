@@ -23,10 +23,13 @@ function AuthPage() {
   const isLoading = useRouterState({ select: (s) => s.isLoading });
 
   useEffect(() => {
+    // Ensure no stale form values persist after logout / back navigation
+    setEmail("");
+    setPassword("");
     return () => {
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     };
-  }, []);
+  }, [mode]);
 
   const showAuthError = () => {
     setAuthError("err");
