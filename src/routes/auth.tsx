@@ -23,10 +23,13 @@ function AuthPage() {
   const isLoading = useRouterState({ select: (s) => s.isLoading });
 
   useEffect(() => {
+    // Ensure no stale form values persist after logout / back navigation
+    setEmail("");
+    setPassword("");
     return () => {
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     };
-  }, []);
+  }, [mode]);
 
   const showAuthError = () => {
     setAuthError("err");
@@ -119,7 +122,9 @@ function AuthPage() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="space-y-3">
+          <form onSubmit={onSubmit} className="space-y-3" autoComplete="off">
+            <input type="text" name="prevent-autofill" autoComplete="off" className="hidden" tabIndex={-1} aria-hidden="true" />
+            <input type="password" name="prevent-autofill-pw" autoComplete="new-password" className="hidden" tabIndex={-1} aria-hidden="true" />
             <label className="block">
               <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 E-mail
@@ -129,7 +134,11 @@ function AuthPage() {
                 <input
                   required
                   type="email"
-                  autoComplete="email"
+                  name="vanilc-admin-email"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-xl border border-border bg-card pl-10 pr-3 py-2.5 text-sm outline-none focus:border-primary"
@@ -146,7 +155,11 @@ function AuthPage() {
                   required
                   minLength={6}
                   type="password"
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  name="vanilc-admin-password"
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-border bg-card pl-10 pr-3 py-2.5 text-sm outline-none focus:border-primary"

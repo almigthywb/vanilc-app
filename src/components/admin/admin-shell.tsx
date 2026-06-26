@@ -92,8 +92,34 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: "global" });
+    } catch {
+      // ignore
+    }
+    if (typeof window !== "undefined") {
+      try {
+        // Remove any lingering Supabase auth tokens
+        for (const key of Object.keys(window.localStorage)) {
+          if (key.startsWith("sb-") || key.includes("supabase")) {
+            window.localStorage.removeItem(key);
+          }
+        }
+        for (const key of Object.keys(window.sessionStorage)) {
+          if (key.startsWith("sb-") || key.includes("supabase")) {
+            window.sessionStorage.removeItem(key);
+          }
+        }
+      } catch {
+        // storage may be unavailable
+      }
+    }
+    setUser(null);
     navigate({ to: "/auth", replace: true });
+    if (typeof window !== "undefined") {
+      // Hard reload to ensure no in-memory state remains and back button can't restore
+      setTimeout(() => window.location.replace("/auth"), 0);
+    }
   };
 
   const isAdmin = role.data?.isAdmin ?? false;
