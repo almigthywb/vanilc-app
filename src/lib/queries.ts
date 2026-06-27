@@ -38,6 +38,8 @@ export interface Settings {
   business_hours: string | null;
   logo_url: string | null;
   banner_url: string | null;
+  banner_url_desktop: string | null;
+  banner_url_mobile: string | null;
 }
 
 
