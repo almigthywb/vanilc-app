@@ -47,11 +47,15 @@ function HomeContent() {
     settings.banner_url ??
     heroImg;
 
-  const featured = products.filter((p) => p.is_featured && p.available).slice(0, 8);
-  const combos = products.filter((p) => {
+  const FEATURED_LIMIT = 5;
+  const COMBOS_LIMIT = 3;
+  const allFeatured = products.filter((p) => p.is_featured && p.available);
+  const featured = allFeatured.slice(0, FEATURED_LIMIT);
+  const allCombos = products.filter((p) => {
     const cat = categories.find((c) => c.id === p.category_id);
     return cat?.slug === "combos";
   });
+  const combos = allCombos.slice(0, COMBOS_LIMIT);
 
   return (
     <div className="space-y-8 pb-12">
