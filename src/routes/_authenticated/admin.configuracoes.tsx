@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { Save, Phone, MapPin, Clock, Truck, DollarSign } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, Phone, MapPin, Clock, Truck, DollarSign, Image as ImageIcon, Upload, Trash2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { adminSettingsQuery, type Settings } from "@/lib/queries";
