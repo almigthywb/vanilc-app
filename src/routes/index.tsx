@@ -98,7 +98,7 @@ function HomeContent() {
       {/* Combos */}
       {combos.length > 0 && (
         <section>
-          <SectionHeader title="Combos especiais" linkTo="combos" />
+          <SectionHeader title="Combos especiais" linkTo="combos" showLink={allCombos.length > COMBOS_LIMIT} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {combos.map((p) => (
               <ProductCard key={p.id} product={p} variant="wide" />
