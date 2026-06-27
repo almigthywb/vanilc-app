@@ -5,6 +5,7 @@ import { CustomerShell } from "@/components/site/customer-shell";
 import { ProductCard } from "@/components/site/product-card";
 import { categoriesQuery, productsQuery, settingsQuery } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroImg from "@/assets/hero-churrasco.jpg";
 
 export const Route = createFileRoute("/")({
