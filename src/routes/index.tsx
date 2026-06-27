@@ -47,11 +47,15 @@ function HomeContent() {
     settings.banner_url ??
     heroImg;
 
-  const featured = products.filter((p) => p.is_featured && p.available).slice(0, 8);
-  const combos = products.filter((p) => {
+  const FEATURED_LIMIT = 5;
+  const COMBOS_LIMIT = 3;
+  const allFeatured = products.filter((p) => p.is_featured && p.available);
+  const featured = allFeatured.slice(0, FEATURED_LIMIT);
+  const allCombos = products.filter((p) => {
     const cat = categories.find((c) => c.id === p.category_id);
     return cat?.slug === "combos";
   });
+  const combos = allCombos.slice(0, COMBOS_LIMIT);
 
   return (
     <div className="space-y-8 pb-12">
@@ -83,7 +87,7 @@ function HomeContent() {
 
       {/* Destaques */}
       <section>
-        <SectionHeader title="Destaques" linkTo="carnes" />
+        <SectionHeader title="Destaques" linkTo="carnes" showLink={allFeatured.length > FEATURED_LIMIT} />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {featured.map((p) => (
             <ProductCard key={p.id} product={p} />
@@ -94,7 +98,7 @@ function HomeContent() {
       {/* Combos */}
       {combos.length > 0 && (
         <section>
-          <SectionHeader title="Combos especiais" linkTo="combos" />
+          <SectionHeader title="Combos especiais" linkTo="combos" showLink={allCombos.length > COMBOS_LIMIT} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {combos.map((p) => (
               <ProductCard key={p.id} product={p} variant="wide" />
@@ -128,17 +132,28 @@ function HomeContent() {
   );
 }
 
-function SectionHeader({ title, linkTo }: { title: string; linkTo: string }) {
+function SectionHeader({
+  title,
+  linkTo,
+  showLink = true,
+}: {
+  title: string;
+  linkTo: string;
+  showLink?: boolean;
+}) {
   return (
-    <div className="mb-3 flex items-center justify-between">
+    <div className="mb-3 flex items-center justify-between gap-3">
       <h2 className="font-display text-2xl text-foreground sm:text-3xl">{title}</h2>
-      <Link
-        to="/cardapio/$slug"
-        params={{ slug: linkTo }}
-        className="flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-      >
-        Ver todos <ArrowRight className="h-4 w-4" />
-      </Link>
+      {showLink && (
+        <Link
+          to="/cardapio/$slug"
+          params={{ slug: linkTo }}
+          className="group inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-flame"
+        >
+          Ver Todos
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+      )}
     </div>
   );
 }
