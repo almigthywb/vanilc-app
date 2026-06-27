@@ -87,7 +87,7 @@ function HomeContent() {
 
       {/* Destaques */}
       <section>
-        <SectionHeader title="Destaques" linkTo="carnes" />
+        <SectionHeader title="Destaques" linkTo="carnes" showLink={allFeatured.length > FEATURED_LIMIT} />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {featured.map((p) => (
             <ProductCard key={p.id} product={p} />
