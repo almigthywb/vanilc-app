@@ -132,17 +132,28 @@ function HomeContent() {
   );
 }
 
-function SectionHeader({ title, linkTo }: { title: string; linkTo: string }) {
+function SectionHeader({
+  title,
+  linkTo,
+  showLink = true,
+}: {
+  title: string;
+  linkTo: string;
+  showLink?: boolean;
+}) {
   return (
-    <div className="mb-3 flex items-center justify-between">
+    <div className="mb-3 flex items-center justify-between gap-3">
       <h2 className="font-display text-2xl text-foreground sm:text-3xl">{title}</h2>
-      <Link
-        to="/cardapio/$slug"
-        params={{ slug: linkTo }}
-        className="flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-      >
-        Ver todos <ArrowRight className="h-4 w-4" />
-      </Link>
+      {showLink && (
+        <Link
+          to="/cardapio/$slug"
+          params={{ slug: linkTo }}
+          className="group inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-flame"
+        >
+          Ver Todos
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+      )}
     </div>
   );
 }
