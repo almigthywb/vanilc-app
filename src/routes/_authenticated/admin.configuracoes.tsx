@@ -35,6 +35,8 @@ function SettingsPage() {
           address: s.address,
           business_hours: s.business_hours,
           store_open: s.store_open,
+          banner_url_desktop: s.banner_url_desktop,
+          banner_url_mobile: s.banner_url_mobile,
         })
         .eq("id", 1);
       if (error) throw error;
