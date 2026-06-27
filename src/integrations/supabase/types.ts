@@ -320,6 +320,8 @@ export type Database = {
         Row: {
           address: string | null
           banner_url: string | null
+          banner_url_desktop: string | null
+          banner_url_mobile: string | null
           business_hours: string | null
           delivery_fee_city: number
           delivery_fee_outside: number
@@ -334,6 +336,8 @@ export type Database = {
         Insert: {
           address?: string | null
           banner_url?: string | null
+          banner_url_desktop?: string | null
+          banner_url_mobile?: string | null
           business_hours?: string | null
           delivery_fee_city?: number
           delivery_fee_outside?: number
@@ -348,6 +352,8 @@ export type Database = {
         Update: {
           address?: string | null
           banner_url?: string | null
+          banner_url_desktop?: string | null
+          banner_url_mobile?: string | null
           business_hours?: string | null
           delivery_fee_city?: number
           delivery_fee_outside?: number
