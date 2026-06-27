@@ -5,6 +5,7 @@ import { CustomerShell } from "@/components/site/customer-shell";
 import { ProductCard } from "@/components/site/product-card";
 import { categoriesQuery, productsQuery, settingsQuery } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroImg from "@/assets/hero-churrasco.jpg";
 
 export const Route = createFileRoute("/")({
@@ -37,6 +38,14 @@ function HomePage() {
 function HomeContent() {
   const { data: categories } = useSuspenseQuery(categoriesQuery);
   const { data: products } = useSuspenseQuery(productsQuery);
+  const { data: settings } = useSuspenseQuery(settingsQuery);
+  const isMobile = useIsMobile();
+
+  const heroSrc =
+    (isMobile ? settings.banner_url_mobile : settings.banner_url_desktop) ??
+    settings.banner_url_desktop ??
+    settings.banner_url ??
+    heroImg;
 
   const featured = products.filter((p) => p.is_featured && p.available).slice(0, 8);
   const combos = products.filter((p) => {
@@ -49,8 +58,8 @@ function HomeContent() {
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl bg-charcoal shadow-card">
         <img
-          src={heroImg}
-          alt="Picanha grelhada"
+          src={heroSrc}
+          alt="Banner Vanilc"
           width={1536}
           height={896}
           className="h-[280px] w-full object-cover opacity-90 sm:h-[360px] md:h-[420px]"

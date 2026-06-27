@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { Save, Phone, MapPin, Clock, Truck, DollarSign } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, Phone, MapPin, Clock, Truck, DollarSign, Image as ImageIcon, Upload, Trash2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { adminSettingsQuery, type Settings } from "@/lib/queries";
@@ -35,6 +35,8 @@ function SettingsPage() {
           address: s.address,
           business_hours: s.business_hours,
           store_open: s.store_open,
+          banner_url_desktop: s.banner_url_desktop,
+          banner_url_mobile: s.banner_url_mobile,
         })
         .eq("id", 1);
       if (error) throw error;
@@ -142,6 +144,28 @@ function SettingsPage() {
           </Field>
         </Section>
 
+        <Section title="Banner da Página Inicial" Icon={ImageIcon}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <BannerUpload
+              label="Banner Desktop (PC)"
+              hint="Recomendado: 1920 × 700 px para melhor qualidade em computadores."
+              aspect="aspect-[16/7]"
+              value={s.banner_url_desktop}
+              onChange={(url) => setS({ ...s, banner_url_desktop: url })}
+              storagePath="banners/desktop"
+            />
+            <BannerUpload
+              label="Banner Mobile"
+              hint="Recomendado: 1080 × 1350 px para melhor visualização em smartphones."
+              aspect="aspect-[4/5]"
+              value={s.banner_url_mobile}
+              onChange={(url) => setS({ ...s, banner_url_mobile: url })}
+              storagePath="banners/mobile"
+            />
+          </div>
+        </Section>
+
+
         <Section title="Status da loja" Icon={DollarSign}>
           <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
             <div>
@@ -203,5 +227,121 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       </span>
       {children}
     </label>
+  );
+}
+
+function BannerUpload({
+  label,
+  hint,
+  aspect,
+  value,
+  onChange,
+  storagePath,
+}: {
+  label: string;
+  hint: string;
+  aspect: string;
+  value: string | null;
+  onChange: (url: string | null) => void;
+  storagePath: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const upload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${storagePath}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("vanilc-media")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("vanilc-media").getPublicUrl(path);
+      onChange(data.publicUrl);
+      toast.success("Imagem enviada. Lembre-se de salvar.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro no upload");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-border bg-background/40 p-4">
+      <p className="mb-2 text-sm font-semibold">{label}</p>
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) upload(file);
+        }}
+        onClick={() => inputRef.current?.click()}
+        className={`relative ${aspect} w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-colors ${
+          dragOver ? "border-primary bg-primary/5" : "border-border bg-muted/30 hover:border-primary/60"
+        }`}
+      >
+        {value ? (
+          <img src={value} alt={label} className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full w-full place-items-center text-center text-xs text-muted-foreground">
+            <div>
+              <ImageIcon className="mx-auto mb-2 h-8 w-8 opacity-50" />
+              <p>Arraste e solte ou clique para enviar</p>
+            </div>
+          </div>
+        )}
+        {uploading && (
+          <div className="absolute inset-0 grid place-items-center bg-background/70">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        )}
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) upload(file);
+          e.target.value = "";
+        }}
+      />
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+        >
+          <Upload className="mr-2 h-4 w-4" /> Alterar Banner
+        </Button>
+        {value && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange(null)}
+            disabled={uploading}
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Remover
+          </Button>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{hint}</p>
+    </div>
   );
 }

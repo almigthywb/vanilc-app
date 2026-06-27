@@ -38,6 +38,8 @@ export interface Settings {
   business_hours: string | null;
   logo_url: string | null;
   banner_url: string | null;
+  banner_url_desktop: string | null;
+  banner_url_mobile: string | null;
 }
 
 
@@ -71,7 +73,7 @@ export const productsQuery = queryOptions({
 });
 
 const SETTINGS_PUBLIC_COLUMNS =
-  "id, store_open, delivery_fee_city, delivery_fee_outside, prep_time_min, prep_time_max, address, business_hours, logo_url, banner_url";
+  "id, store_open, delivery_fee_city, delivery_fee_outside, prep_time_min, prep_time_max, address, business_hours, logo_url, banner_url, banner_url_desktop, banner_url_mobile";
 
 export const settingsQuery = queryOptions({
   queryKey: ["settings"],
