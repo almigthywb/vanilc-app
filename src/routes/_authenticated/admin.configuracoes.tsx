@@ -144,6 +144,28 @@ function SettingsPage() {
           </Field>
         </Section>
 
+        <Section title="Banner da Página Inicial" Icon={ImageIcon}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <BannerUpload
+              label="Banner Desktop (PC)"
+              hint="Recomendado: 1920 × 700 px para melhor qualidade em computadores."
+              aspect="aspect-[16/7]"
+              value={s.banner_url_desktop}
+              onChange={(url) => setS({ ...s, banner_url_desktop: url })}
+              storagePath="banners/desktop"
+            />
+            <BannerUpload
+              label="Banner Mobile"
+              hint="Recomendado: 1080 × 1350 px para melhor visualização em smartphones."
+              aspect="aspect-[4/5]"
+              value={s.banner_url_mobile}
+              onChange={(url) => setS({ ...s, banner_url_mobile: url })}
+              storagePath="banners/mobile"
+            />
+          </div>
+        </Section>
+
+
         <Section title="Status da loja" Icon={DollarSign}>
           <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
             <div>
