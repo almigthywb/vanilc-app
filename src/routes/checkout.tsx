@@ -46,7 +46,9 @@ function CheckoutPage() {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [dialCode, setDialCode] = useState("+244");
   const [phone, setPhone] = useState("");
+
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("city");
   const [address, setAddress] = useState("");
   const [payment, setPayment] = useState<Payment>("cash");
