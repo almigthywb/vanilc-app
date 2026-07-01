@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "anyone read vanilc-media" ON storage.objects;
