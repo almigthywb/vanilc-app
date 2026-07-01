@@ -99,14 +99,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
         <div className="ml-auto flex flex-1 items-center justify-end gap-3">
           <div className="hidden flex-1 max-w-xl md:block">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="search"
-                placeholder="Buscar produtos..."
-                className="h-12 w-full rounded-full border border-border bg-muted/40 pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:bg-card"
-              />
-            </div>
+            <SearchBox />
           </div>
 
           <Link
