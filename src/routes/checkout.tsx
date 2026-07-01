@@ -164,16 +164,31 @@ function CheckoutPage() {
               />
             </Field>
             <Field label="Telefone" required>
-              <input
-                required
-                type="tel"
-                inputMode="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+244 9XX XXX XXX"
-                className={inputClass}
-              />
+              <div className="flex gap-2">
+                <select
+                  value={dialCode}
+                  onChange={(e) => setDialCode(e.target.value)}
+                  className={`${inputClass} w-[110px] shrink-0 pr-2`}
+                  aria-label="Código do país"
+                >
+                  {COUNTRY_CODES.map((c) => (
+                    <option key={c.code} value={c.dial}>
+                      {c.flag} {c.dial}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  required
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ""))}
+                  placeholder="9XX XXX XXX"
+                  className={inputClass}
+                />
+              </div>
             </Field>
+
           </div>
         </Card>
 
