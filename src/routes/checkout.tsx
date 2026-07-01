@@ -27,6 +27,25 @@ const DELIVERY_LABEL: Record<DeliveryType, string> = {
   outside: "Entrega fora da cidade",
 };
 
+const COUNTRY_CODES: Array<{ code: string; dial: string; flag: string; name: string }> = [
+  { code: "AO", dial: "+244", flag: "🇦🇴", name: "Angola" },
+  { code: "PT", dial: "+351", flag: "🇵🇹", name: "Portugal" },
+  { code: "BR", dial: "+55", flag: "🇧🇷", name: "Brasil" },
+  { code: "MZ", dial: "+258", flag: "🇲🇿", name: "Moçambique" },
+  { code: "CV", dial: "+238", flag: "🇨🇻", name: "Cabo Verde" },
+  { code: "ST", dial: "+239", flag: "🇸🇹", name: "São Tomé e Príncipe" },
+  { code: "GW", dial: "+245", flag: "🇬🇼", name: "Guiné-Bissau" },
+  { code: "ZA", dial: "+27", flag: "🇿🇦", name: "África do Sul" },
+  { code: "NA", dial: "+264", flag: "🇳🇦", name: "Namíbia" },
+  { code: "CD", dial: "+243", flag: "🇨🇩", name: "RD Congo" },
+  { code: "CG", dial: "+242", flag: "🇨🇬", name: "Congo" },
+  { code: "US", dial: "+1", flag: "🇺🇸", name: "Estados Unidos" },
+  { code: "GB", dial: "+44", flag: "🇬🇧", name: "Reino Unido" },
+  { code: "FR", dial: "+33", flag: "🇫🇷", name: "França" },
+  { code: "ES", dial: "+34", flag: "🇪🇸", name: "Espanha" },
+];
+
+
 export const Route = createFileRoute("/checkout")({
   loader: ({ context }) => context.queryClient.ensureQueryData(settingsQuery),
   head: () => ({ meta: [{ title: "Finalizar pedido — Vanilc" }] }),
@@ -46,7 +65,9 @@ function CheckoutPage() {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [dialCode, setDialCode] = useState("+244");
   const [phone, setPhone] = useState("");
+
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("city");
   const [address, setAddress] = useState("");
   const [payment, setPayment] = useState<Payment>("cash");
@@ -89,11 +110,12 @@ function CheckoutPage() {
     if (submitting) return;
     setSubmitting(true);
     try {
+      const fullPhone = `${dialCode} ${phone.trim()}`.trim();
       const result = await createOrderFn({
         data: {
           firstName,
           lastName,
-          phone,
+          phone: fullPhone,
           deliveryType,
           address,
           paymentMethod: payment,
@@ -111,7 +133,8 @@ function CheckoutPage() {
         orderNumber: result.orderNumber,
         firstName,
         lastName,
-        phone,
+        phone: fullPhone,
+
         deliveryType,
         address,
         items,
@@ -164,16 +187,31 @@ function CheckoutPage() {
               />
             </Field>
             <Field label="Telefone" required>
-              <input
-                required
-                type="tel"
-                inputMode="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+244 9XX XXX XXX"
-                className={inputClass}
-              />
+              <div className="flex gap-2">
+                <select
+                  value={dialCode}
+                  onChange={(e) => setDialCode(e.target.value)}
+                  className={`${inputClass} w-[110px] shrink-0 pr-2`}
+                  aria-label="Código do país"
+                >
+                  {COUNTRY_CODES.map((c) => (
+                    <option key={c.code} value={c.dial}>
+                      {c.flag} {c.dial}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  required
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ""))}
+                  placeholder="9XX XXX XXX"
+                  className={inputClass}
+                />
+              </div>
             </Field>
+
           </div>
         </Card>
 
