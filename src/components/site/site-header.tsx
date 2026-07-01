@@ -4,6 +4,7 @@ import { useState } from "react";
 import logo from "@/assets/vanilc-logo.png";
 import { useCart, cartCount } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
+import { SearchBox } from "./search-box";
 
 interface Props {
   onOpenCart: () => void;
@@ -98,14 +99,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
         <div className="ml-auto flex flex-1 items-center justify-end gap-3">
           <div className="hidden flex-1 max-w-xl md:block">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="search"
-                placeholder="Buscar produtos..."
-                className="h-12 w-full rounded-full border border-border bg-muted/40 pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:bg-card"
-              />
-            </div>
+            <SearchBox />
           </div>
 
           <Link
@@ -141,22 +135,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
       {searchOpen && (
         <div className="border-t border-border bg-card px-3 py-3 sm:hidden">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              autoFocus
-              type="search"
-              placeholder="Buscar produtos..."
-              className="h-11 w-full rounded-full border border-border bg-muted/40 pl-11 pr-10 text-sm outline-none focus:border-primary"
-            />
-            <button
-              type="button"
-              onClick={() => setSearchOpen(false)}
-              className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full hover:bg-muted"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <SearchBox autoFocus onClose={() => setSearchOpen(false)} />
         </div>
       )}
     </header>
