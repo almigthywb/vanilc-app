@@ -4,6 +4,7 @@ import { useState } from "react";
 import logo from "@/assets/vanilc-logo.png";
 import { useCart, cartCount } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
+import { SearchBox } from "./search-box";
 
 interface Props {
   onOpenCart: () => void;
