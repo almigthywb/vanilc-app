@@ -135,22 +135,7 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
 
       {searchOpen && (
         <div className="border-t border-border bg-card px-3 py-3 sm:hidden">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              autoFocus
-              type="search"
-              placeholder="Buscar produtos..."
-              className="h-11 w-full rounded-full border border-border bg-muted/40 pl-11 pr-10 text-sm outline-none focus:border-primary"
-            />
-            <button
-              type="button"
-              onClick={() => setSearchOpen(false)}
-              className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full hover:bg-muted"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <SearchBox autoFocus onClose={() => setSearchOpen(false)} />
         </div>
       )}
     </header>
