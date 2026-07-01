@@ -110,11 +110,12 @@ function CheckoutPage() {
     if (submitting) return;
     setSubmitting(true);
     try {
+      const fullPhone = `${dialCode} ${phone.trim()}`.trim();
       const result = await createOrderFn({
         data: {
           firstName,
           lastName,
-          phone,
+          phone: fullPhone,
           deliveryType,
           address,
           paymentMethod: payment,
@@ -132,7 +133,8 @@ function CheckoutPage() {
         orderNumber: result.orderNumber,
         firstName,
         lastName,
-        phone,
+        phone: fullPhone,
+
         deliveryType,
         address,
         items,
