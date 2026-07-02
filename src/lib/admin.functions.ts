@@ -145,3 +145,25 @@ export const deleteAdminCategory = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+const UploadInput = z.object({
+  path: z.string().min(1),
+  contentType: z.string().min(1),
+  dataBase64: z.string().min(1),
+});
+
+export const uploadAdminMedia = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => UploadInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const bytes = Uint8Array.from(atob(data.dataBase64), (c) => c.charCodeAt(0));
+    const safePath = data.path.replace(/[^a-zA-Z0-9/_.-]/g, "_");
+    const { error } = await supabaseAdmin.storage
+      .from("vanilc-media")
+      .upload(safePath, bytes, { upsert: true, contentType: data.contentType });
+    if (error) throw new Error(error.message);
+    const { data: pub } = supabaseAdmin.storage.from("vanilc-media").getPublicUrl(safePath);
+    return { publicUrl: pub.publicUrl };
+  });
