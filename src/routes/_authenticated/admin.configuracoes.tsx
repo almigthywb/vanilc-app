@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { Save, Phone, MapPin, Clock, Truck, DollarSign, Image as ImageIcon, Upload, Trash2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { uploadAdminMedia } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { adminSettingsQuery, type Settings } from "@/lib/queries";
 import { toast } from "sonner";
