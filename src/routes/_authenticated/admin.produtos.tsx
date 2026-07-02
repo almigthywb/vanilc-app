@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatKwanza } from "@/lib/format";
 import { resolveProductImage } from "@/lib/product-images";
-import { deleteAdminProduct, saveAdminProduct } from "@/lib/admin.functions";
+import { deleteAdminProduct, saveAdminProduct, uploadAdminMedia } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/produtos")({
