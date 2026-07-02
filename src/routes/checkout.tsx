@@ -187,11 +187,11 @@ function CheckoutPage() {
               />
             </Field>
             <Field label="Telefone" required>
-              <div className="flex gap-2">
+              <div className="flex items-stretch gap-2">
                 <select
                   value={dialCode}
                   onChange={(e) => setDialCode(e.target.value)}
-                  className={`${inputClass} w-[110px] shrink-0 pr-2`}
+                  className={`${inputClass} w-[92px] shrink-0 px-2 text-center font-medium`}
                   aria-label="Código do país"
                 >
                   {COUNTRY_CODES.map((c) => (
@@ -207,7 +207,7 @@ function CheckoutPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ""))}
                   placeholder="9XX XXX XXX"
-                  className={inputClass}
+                  className={`${inputClass} min-w-0 flex-1`}
                 />
               </div>
             </Field>
