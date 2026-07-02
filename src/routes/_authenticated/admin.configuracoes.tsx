@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { Save, Phone, MapPin, Clock, Truck, DollarSign, Image as ImageIcon, Upload, Trash2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { uploadAdminMedia } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { adminSettingsQuery, type Settings } from "@/lib/queries";
 import { toast } from "sonner";
@@ -248,6 +250,7 @@ function BannerUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const uploadMedia = useServerFn(uploadAdminMedia);
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -256,14 +259,17 @@ function BannerUpload({
     }
     setUploading(true);
     try {
+      const buf = await file.arrayBuffer();
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const dataBase64 = btoa(binary);
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${storagePath}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("vanilc-media")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (error) throw error;
-      const { data } = supabase.storage.from("vanilc-media").getPublicUrl(path);
-      onChange(data.publicUrl);
+      const res = await uploadMedia({
+        data: { path, contentType: file.type, dataBase64 },
+      });
+      onChange(res.publicUrl);
       toast.success("Imagem enviada. Lembre-se de salvar.");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro no upload");
