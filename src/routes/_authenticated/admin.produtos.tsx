@@ -165,6 +165,7 @@ function ProductModal({
   const [uploading, setUploading] = useState(false);
   const queryClient = useQueryClient();
   const saveProduct = useServerFn(saveAdminProduct);
+  const uploadMedia = useServerFn(uploadAdminMedia);
 
   const save = useMutation({
     mutationFn: async () => {
