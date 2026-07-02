@@ -199,11 +199,16 @@ function ProductModal({
   const onUpload = async (file: File) => {
     setUploading(true);
     try {
+      const buf = await file.arrayBuffer();
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const dataBase64 = btoa(binary);
       const path = `products/${Date.now()}-${file.name.replace(/[^a-z0-9.-]/gi, "_")}`;
-      const { error } = await supabase.storage.from("vanilc-media").upload(path, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from("vanilc-media").getPublicUrl(path);
-      setF((s) => ({ ...s, image_url: data.publicUrl }));
+      const res = await uploadMedia({
+        data: { path, contentType: file.type || "application/octet-stream", dataBase64 },
+      });
+      setF((s) => ({ ...s, image_url: res.publicUrl }));
       toast.success("Imagem enviada");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro no upload");
