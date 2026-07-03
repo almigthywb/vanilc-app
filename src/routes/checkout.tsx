@@ -170,31 +170,23 @@ function CheckoutPage() {
                 className={inputClass}
               />
             </Field>
-            <Field label="Telefone" required>
-              <div className="flex items-stretch gap-2">
-                <select
-                  value={dialCode}
-                  onChange={(e) => setDialCode(e.target.value)}
-                  className={`${inputClass} w-[92px] shrink-0 px-2 text-center font-medium`}
-                  aria-label="Código do país"
-                >
-                  {COUNTRY_CODES.map((c) => (
-                    <option key={c.code} value={c.dial}>
-                      {c.flag} {c.dial}
-                    </option>
-                  ))}
-                </select>
-                <input
+            <div className="sm:col-span-2">
+              <Field label="Telefone" required>
+                <PhoneInput
+                  dialCode={dialCode}
+                  onDialCodeChange={setDialCode}
+                  phone={phone}
+                  onPhoneChange={setPhone}
                   required
-                  type="tel"
-                  inputMode="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ""))}
-                  placeholder="9XX XXX XXX"
-                  className={`${inputClass} min-w-0 flex-1`}
+                  error={
+                    phone.length > 0 && !isValidPhone(phone)
+                      ? "Introduza um número de telefone válido."
+                      : undefined
+                  }
                 />
-              </div>
-            </Field>
+              </Field>
+            </div>
+
 
           </div>
         </Card>
