@@ -10,6 +10,7 @@ import { formatKwanza } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/lib/orders.functions";
 import { toast } from "sonner";
+import { PhoneInput, isValidPhone } from "@/components/site/phone-input";
 
 type DeliveryType = "pickup" | "city" | "outside";
 type Payment = "tpa" | "qr_code" | "unitel_money" | "cash";
