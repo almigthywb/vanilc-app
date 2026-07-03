@@ -10,6 +10,7 @@ import { formatKwanza } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/lib/orders.functions";
 import { toast } from "sonner";
+import { PhoneInput, isValidPhone } from "@/components/site/phone-input";
 
 type DeliveryType = "pickup" | "city" | "outside";
 type Payment = "tpa" | "qr_code" | "unitel_money" | "cash";
@@ -27,23 +28,6 @@ const DELIVERY_LABEL: Record<DeliveryType, string> = {
   outside: "Entrega fora da cidade",
 };
 
-const COUNTRY_CODES: Array<{ code: string; dial: string; flag: string; name: string }> = [
-  { code: "AO", dial: "+244", flag: "🇦🇴", name: "Angola" },
-  { code: "PT", dial: "+351", flag: "🇵🇹", name: "Portugal" },
-  { code: "BR", dial: "+55", flag: "🇧🇷", name: "Brasil" },
-  { code: "MZ", dial: "+258", flag: "🇲🇿", name: "Moçambique" },
-  { code: "CV", dial: "+238", flag: "🇨🇻", name: "Cabo Verde" },
-  { code: "ST", dial: "+239", flag: "🇸🇹", name: "São Tomé e Príncipe" },
-  { code: "GW", dial: "+245", flag: "🇬🇼", name: "Guiné-Bissau" },
-  { code: "ZA", dial: "+27", flag: "🇿🇦", name: "África do Sul" },
-  { code: "NA", dial: "+264", flag: "🇳🇦", name: "Namíbia" },
-  { code: "CD", dial: "+243", flag: "🇨🇩", name: "RD Congo" },
-  { code: "CG", dial: "+242", flag: "🇨🇬", name: "Congo" },
-  { code: "US", dial: "+1", flag: "🇺🇸", name: "Estados Unidos" },
-  { code: "GB", dial: "+44", flag: "🇬🇧", name: "Reino Unido" },
-  { code: "FR", dial: "+33", flag: "🇫🇷", name: "França" },
-  { code: "ES", dial: "+34", flag: "🇪🇸", name: "Espanha" },
-];
 
 
 export const Route = createFileRoute("/checkout")({
@@ -186,31 +170,23 @@ function CheckoutPage() {
                 className={inputClass}
               />
             </Field>
-            <Field label="Telefone" required>
-              <div className="flex items-stretch gap-2">
-                <select
-                  value={dialCode}
-                  onChange={(e) => setDialCode(e.target.value)}
-                  className={`${inputClass} w-[92px] shrink-0 px-2 text-center font-medium`}
-                  aria-label="Código do país"
-                >
-                  {COUNTRY_CODES.map((c) => (
-                    <option key={c.code} value={c.dial}>
-                      {c.flag} {c.dial}
-                    </option>
-                  ))}
-                </select>
-                <input
+            <div className="sm:col-span-2">
+              <Field label="Telefone" required>
+                <PhoneInput
+                  dialCode={dialCode}
+                  onDialCodeChange={setDialCode}
+                  phone={phone}
+                  onPhoneChange={setPhone}
                   required
-                  type="tel"
-                  inputMode="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ""))}
-                  placeholder="9XX XXX XXX"
-                  className={`${inputClass} min-w-0 flex-1`}
+                  error={
+                    phone.length > 0 && !isValidPhone(phone)
+                      ? "Introduza um número de telefone válido."
+                      : undefined
+                  }
                 />
-              </div>
-            </Field>
+              </Field>
+            </div>
+
 
           </div>
         </Card>
