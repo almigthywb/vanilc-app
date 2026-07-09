@@ -152,6 +152,26 @@ const UploadInput = z.object({
   dataBase64: z.string().min(1),
 });
 
+const ReorderInput = z.object({
+  items: z.array(z.object({ id: z.string().uuid(), sort_order: z.number().int() })).min(1),
+});
+
+export const reorderAdminProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ReorderInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    for (const item of data.items) {
+      const { error } = await supabaseAdmin
+        .from("products")
+        .update({ sort_order: item.sort_order })
+        .eq("id", item.id);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
 export const uploadAdminMedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UploadInput.parse(d))
