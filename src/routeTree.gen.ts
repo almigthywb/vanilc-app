@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
+import { Route as AuthenticatedAdminProdutosIndexRouteImport } from './routes/_authenticated/admin.produtos.index'
 import { Route as AuthenticatedAdminProdutosCategoryIdRouteImport } from './routes/_authenticated/admin.produtos.$categoryId'
 
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -94,6 +95,12 @@ const AuthenticatedAdminCategoriasRoute =
     path: '/categorias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminProdutosIndexRoute =
+  AuthenticatedAdminProdutosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminProdutosRoute,
+  } as any)
 const AuthenticatedAdminProdutosCategoryIdRoute =
   AuthenticatedAdminProdutosCategoryIdRouteImport.update({
     id: '/$categoryId',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/admin/produtos/': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,10 +133,10 @@ export interface FileRoutesByTo {
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
-  '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/_authenticated/admin/produtos/': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/admin/relatorios'
     | '/admin/'
     | '/admin/produtos/$categoryId'
+    | '/admin/produtos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -173,10 +183,10 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/pedidos'
-    | '/admin/produtos'
     | '/admin/relatorios'
     | '/admin'
     | '/admin/produtos/$categoryId'
+    | '/admin/produtos'
   id:
     | '__root__'
     | '/'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/relatorios'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/produtos/$categoryId'
+    | '/_authenticated/admin/produtos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/produtos/': {
+      id: '/_authenticated/admin/produtos/'
+      path: '/'
+      fullPath: '/admin/produtos/'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminProdutosRoute
+    }
     '/_authenticated/admin/produtos/$categoryId': {
       id: '/_authenticated/admin/produtos/$categoryId'
       path: '/$categoryId'
@@ -308,12 +326,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminProdutosRouteChildren {
   AuthenticatedAdminProdutosCategoryIdRoute: typeof AuthenticatedAdminProdutosCategoryIdRoute
+  AuthenticatedAdminProdutosIndexRoute: typeof AuthenticatedAdminProdutosIndexRoute
 }
 
 const AuthenticatedAdminProdutosRouteChildren: AuthenticatedAdminProdutosRouteChildren =
   {
     AuthenticatedAdminProdutosCategoryIdRoute:
       AuthenticatedAdminProdutosCategoryIdRoute,
+    AuthenticatedAdminProdutosIndexRoute: AuthenticatedAdminProdutosIndexRoute,
   }
 
 const AuthenticatedAdminProdutosRouteWithChildren =
