@@ -17,11 +17,11 @@ import { Route as CardapioSlugRouteImport } from './routes/cardapio.$slug'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin.relatorios'
-import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin.produtos'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
+import { Route as AuthenticatedAdminProdutosIndexRouteImport } from './routes/_authenticated/admin.produtos.index'
 import { Route as AuthenticatedAdminProdutosCategoryIdRouteImport } from './routes/_authenticated/admin.produtos.$categoryId'
 
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -64,12 +64,6 @@ const AuthenticatedAdminRelatoriosRoute =
     path: '/relatorios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminProdutosRoute =
-  AuthenticatedAdminProdutosRouteImport.update({
-    id: '/produtos',
-    path: '/produtos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedAdminPedidosRoute =
   AuthenticatedAdminPedidosRouteImport.update({
     id: '/pedidos',
@@ -94,11 +88,17 @@ const AuthenticatedAdminCategoriasRoute =
     path: '/categorias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminProdutosIndexRoute =
+  AuthenticatedAdminProdutosIndexRouteImport.update({
+    id: '/produtos/',
+    path: '/produtos/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProdutosCategoryIdRoute =
   AuthenticatedAdminProdutosCategoryIdRouteImport.update({
-    id: '/$categoryId',
-    path: '/$categoryId',
-    getParentRoute: () => AuthenticatedAdminProdutosRoute,
+    id: '/produtos/$categoryId',
+    path: '/produtos/$categoryId',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -111,10 +111,10 @@ export interface FileRoutesByFullPath {
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
-  '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/admin/produtos/': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,10 +125,10 @@ export interface FileRoutesByTo {
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
-  '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/admin/produtos': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,10 +142,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
-  '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
+  '/_authenticated/admin/produtos/': typeof AuthenticatedAdminProdutosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,10 +159,10 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/pedidos'
-    | '/admin/produtos'
     | '/admin/relatorios'
     | '/admin/'
     | '/admin/produtos/$categoryId'
+    | '/admin/produtos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -173,10 +173,10 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/pedidos'
-    | '/admin/produtos'
     | '/admin/relatorios'
     | '/admin'
     | '/admin/produtos/$categoryId'
+    | '/admin/produtos'
   id:
     | '__root__'
     | '/'
@@ -189,10 +189,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/pedidos'
-    | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/relatorios'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/produtos/$categoryId'
+    | '/_authenticated/admin/produtos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,13 +261,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/produtos': {
-      id: '/_authenticated/admin/produtos'
-      path: '/produtos'
-      fullPath: '/admin/produtos'
-      preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/pedidos': {
       id: '/_authenticated/admin/pedidos'
       path: '/pedidos'
@@ -296,39 +289,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/produtos/': {
+      id: '/_authenticated/admin/produtos/'
+      path: '/produtos'
+      fullPath: '/admin/produtos/'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/produtos/$categoryId': {
       id: '/_authenticated/admin/produtos/$categoryId'
-      path: '/$categoryId'
+      path: '/produtos/$categoryId'
       fullPath: '/admin/produtos/$categoryId'
       preLoaderRoute: typeof AuthenticatedAdminProdutosCategoryIdRouteImport
-      parentRoute: typeof AuthenticatedAdminProdutosRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
-
-interface AuthenticatedAdminProdutosRouteChildren {
-  AuthenticatedAdminProdutosCategoryIdRoute: typeof AuthenticatedAdminProdutosCategoryIdRoute
-}
-
-const AuthenticatedAdminProdutosRouteChildren: AuthenticatedAdminProdutosRouteChildren =
-  {
-    AuthenticatedAdminProdutosCategoryIdRoute:
-      AuthenticatedAdminProdutosCategoryIdRoute,
-  }
-
-const AuthenticatedAdminProdutosRouteWithChildren =
-  AuthenticatedAdminProdutosRoute._addFileChildren(
-    AuthenticatedAdminProdutosRouteChildren,
-  )
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
-  AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRouteWithChildren
   AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminProdutosCategoryIdRoute: typeof AuthenticatedAdminProdutosCategoryIdRoute
+  AuthenticatedAdminProdutosIndexRoute: typeof AuthenticatedAdminProdutosIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
@@ -336,9 +322,11 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
-  AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRouteWithChildren,
   AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminProdutosCategoryIdRoute:
+    AuthenticatedAdminProdutosCategoryIdRoute,
+  AuthenticatedAdminProdutosIndexRoute: AuthenticatedAdminProdutosIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -365,13 +353,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -4,7 +4,7 @@ import { ChevronRight, FolderTree } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveProductImage } from "@/lib/product-images";
 
-export const Route = createFileRoute("/_authenticated/admin/produtos")({
+export const Route = createFileRoute("/_authenticated/admin/produtos/")({
   component: ProductsCategoriesPage,
 });
 
