@@ -187,3 +187,127 @@ export const uploadAdminMedia = createServerFn({ method: "POST" })
     const { data: pub } = supabaseAdmin.storage.from("vanilc-media").getPublicUrl(safePath);
     return { publicUrl: pub.publicUrl };
   });
+
+const CreateAdminInput = z.object({
+  email: z.string().trim().email(),
+  password: z.string().min(8),
+});
+
+const RemoveAdminInput = z.object({ userId: z.string().uuid() });
+
+export const listAdmins = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("id, user_id, created_at, created_by")
+      .eq("role", "admin");
+    if (error) throw new Error(error.message);
+    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
+    if (lErr) throw new Error(lErr.message);
+    const byId = new Map(list.users.map((u) => [u.id, u]));
+    const admins = (roles ?? []).map((r) => {
+      const u = byId.get(r.user_id);
+      return {
+        id: r.id,
+        userId: r.user_id,
+        email: u?.email ?? "(desconhecido)",
+        createdAt: r.created_at,
+        lastSignInAt: u?.last_sign_in_at ?? null,
+        active: !u?.banned_until,
+        isSelf: r.user_id === context.userId,
+      };
+    });
+    admins.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+    return { admins };
+  });
+
+export const createAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => CreateAdminInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
+    if (lErr) throw new Error(lErr.message);
+    const existing = list.users.find(
+      (u) => (u.email ?? "").toLowerCase() === data.email.toLowerCase(),
+    );
+
+    let targetId: string;
+    if (existing) {
+      const { data: existingRoles } = await supabaseAdmin
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", existing.id)
+        .eq("role", "admin");
+      if (existingRoles && existingRoles.length > 0) {
+        throw new Error("Este e-mail já é administrador.");
+      }
+      targetId = existing.id;
+    } else {
+      const { data: created, error: cErr } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+      });
+      if (cErr) throw new Error(cErr.message);
+      targetId = created.user.id;
+    }
+
+    const { error: rErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: targetId, role: "admin", created_by: context.userId });
+    if (rErr) throw new Error(rErr.message);
+
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId,
+      target_user_id: targetId,
+      target_email: data.email,
+      action: "create",
+    });
+
+    return { ok: true };
+  });
+
+export const removeAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => RemoveAdminInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    if (data.userId === context.userId) {
+      throw new Error("Você não pode remover a si mesmo.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { count, error: cErr } = await supabaseAdmin
+      .from("user_roles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
+    if (cErr) throw new Error(cErr.message);
+    if ((count ?? 0) <= 1) {
+      throw new Error("Deve existir pelo menos um administrador ativo.");
+    }
+
+    let targetEmail: string | null = null;
+    const { data: list } = await supabaseAdmin.auth.admin.listUsers();
+    targetEmail = list?.users.find((u) => u.id === data.userId)?.email ?? null;
+
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId)
+      .eq("role", "admin");
+    if (error) throw new Error(error.message);
+
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId,
+      target_user_id: data.userId,
+      target_email: targetEmail,
+      action: "remove",
+    });
+
+    return { ok: true };
+  });
