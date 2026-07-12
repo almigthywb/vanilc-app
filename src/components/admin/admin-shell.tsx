@@ -35,6 +35,7 @@ const NAV: Array<{ to: string; label: string; Icon: React.ComponentType<{ classN
   { to: "/admin/produtos", label: "Produtos", Icon: Beef },
   { to: "/admin/categorias", label: "Categorias", Icon: FolderTree },
   { to: "/admin/clientes", label: "Clientes", Icon: Users },
+  { to: "/admin/administradores", label: "Administradores", Icon: UserCog },
   { to: "/admin/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/admin/configuracoes", label: "Configurações", Icon: Settings },
 ];
