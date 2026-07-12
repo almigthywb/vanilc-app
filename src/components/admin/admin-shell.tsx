@@ -7,6 +7,7 @@ import {
   Beef,
   FolderTree,
   Users,
+  UserCog,
   BarChart3,
   Settings,
   LogOut,
