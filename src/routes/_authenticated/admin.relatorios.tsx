@@ -21,8 +21,9 @@ function ReportsPage() {
 
       const { data: orders } = await supabase
         .from("orders")
-        .select("id, total, created_at")
-        .gte("created_at", since.toISOString());
+        .select("id, total, completed_at")
+        .eq("status", "completed")
+        .gte("completed_at", since.toISOString());
       const { data: items } = await supabase
         .from("order_items")
         .select("name_snapshot, qty, unit_price, order_id");
