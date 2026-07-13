@@ -56,6 +56,9 @@ export const createOrder = createServerFn({ method: "POST" })
       .eq("phone", data.phone)
       .maybeSingle();
 
+    // Customer stats (total_orders, total_spent, last_order_at) are updated
+    // by a database trigger ONLY when the order is marked as 'completed'.
+    // Here we just keep name/phone in sync.
     if (existing) {
       customerId = existing.id;
       await supabase
@@ -63,9 +66,6 @@ export const createOrder = createServerFn({ method: "POST" })
         .update({
           first_name: data.firstName,
           last_name: data.lastName,
-          total_orders: (existing.total_orders ?? 0) + 1,
-          total_spent: Number(existing.total_spent ?? 0) + total,
-          last_order_at: new Date().toISOString(),
         })
         .eq("id", existing.id);
     } else {
@@ -75,9 +75,8 @@ export const createOrder = createServerFn({ method: "POST" })
           phone: data.phone,
           first_name: data.firstName,
           last_name: data.lastName,
-          total_orders: 1,
-          total_spent: total,
-          last_order_at: new Date().toISOString(),
+          total_orders: 0,
+          total_spent: 0,
         })
         .select("id")
         .single();
