@@ -284,7 +284,7 @@ function OrderModal({ id, onClose }: { id: string; onClose: () => void }) {
                 Alterar status
               </p>
               <div className="flex flex-wrap gap-2">
-                {STATUSES.filter((s) => s.value !== "all").map((s) => (
+                {REAL_STATUSES.map((s) => (
                   <Button
                     key={s.value}
                     variant={o.status === s.value ? "default" : "outline"}
