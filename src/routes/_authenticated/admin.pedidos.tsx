@@ -55,7 +55,11 @@ function OrdersPage() {
         .from("orders")
         .select("*")
         .order("created_at", { ascending: false });
-      if (status !== "all") q = q.eq("status", status as never);
+      if (status === "pending") {
+        q = q.in("status", [...PENDING_STATUSES]);
+      } else if (status !== "all") {
+        q = q.eq("status", status as never);
+      }
       const since = periodSince(period);
       if (since) q = q.gte("created_at", since.toISOString());
       const { data, error } = await q;
