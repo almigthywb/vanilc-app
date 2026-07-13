@@ -1,6 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, DollarSign, Users, TrendingUp } from "lucide-react";
+import {
+  ShoppingBag,
+  DollarSign,
+  Users,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Receipt,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
 
@@ -8,48 +17,84 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: DashboardPage,
 });
 
+const PENDING_STATUSES = ["received", "confirmed", "preparing", "ready", "out_for_delivery"] as const satisfies ReadonlyArray<
+  "received" | "confirmed" | "preparing" | "ready" | "out_for_delivery"
+>;
+
 function DashboardPage() {
-  const stats = useQuery({
-    queryKey: ["admin-dashboard"],
+  const ops = useQuery({
+    queryKey: ["admin-dashboard-ops"],
+    queryFn: async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const [receivedToday, pending, completedToday, cancelledToday] = await Promise.all([
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", today.toISOString()),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .in("status", [...PENDING_STATUSES]),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "completed")
+          .gte("completed_at", today.toISOString())
+          .lt("completed_at", tomorrow.toISOString()),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "cancelled")
+          .gte("cancelled_at", today.toISOString())
+          .lt("cancelled_at", tomorrow.toISOString()),
+      ]);
+
+      return {
+        receivedToday: receivedToday.count ?? 0,
+        pending: pending.count ?? 0,
+        completedToday: completedToday.count ?? 0,
+        cancelledToday: cancelledToday.count ?? 0,
+      };
+    },
+  });
+
+  const fin = useQuery({
+    queryKey: ["admin-dashboard-fin"],
     queryFn: async () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-      const [allOrders, todayOrders, monthOrders, customers] = await Promise.all([
-        supabase.from("orders").select("id, total"),
+      const [allCompleted, monthCompleted, todayCompleted, customers] = await Promise.all([
+        supabase.from("orders").select("id, total").eq("status", "completed"),
         supabase
           .from("orders")
           .select("id, total")
-          .gte("created_at", today.toISOString()),
+          .eq("status", "completed")
+          .gte("completed_at", monthStart.toISOString()),
         supabase
           .from("orders")
           .select("id, total")
-          .gte("created_at", monthStart.toISOString()),
+          .eq("status", "completed")
+          .gte("completed_at", today.toISOString()),
         supabase.from("customers").select("id", { count: "exact", head: true }),
       ]);
 
-      const totalRevenue = (allOrders.data ?? []).reduce(
-        (s, o) => s + Number(o.total),
-        0,
-      );
-      const todayRevenue = (todayOrders.data ?? []).reduce(
-        (s, o) => s + Number(o.total),
-        0,
-      );
-      const monthRevenue = (monthOrders.data ?? []).reduce(
-        (s, o) => s + Number(o.total),
-        0,
-      );
-      const avgTicket = (allOrders.data?.length ?? 0) > 0 ? totalRevenue / (allOrders.data?.length ?? 1) : 0;
+      const sum = (rows: { total: number | string }[] | null) =>
+        (rows ?? []).reduce((s, o) => s + Number(o.total), 0);
 
+      const totalRevenue = sum(allCompleted.data);
+      const totalSales = allCompleted.data?.length ?? 0;
       return {
-        totalOrders: allOrders.data?.length ?? 0,
-        todayOrders: todayOrders.data?.length ?? 0,
-        todayRevenue,
-        monthRevenue,
+        todayRevenue: sum(todayCompleted.data),
+        monthRevenue: sum(monthCompleted.data),
         totalRevenue,
-        avgTicket,
+        totalSales,
+        avgTicket: totalSales > 0 ? totalRevenue / totalSales : 0,
         customers: customers.count ?? 0,
       };
     },
@@ -67,30 +112,49 @@ function DashboardPage() {
     },
   });
 
-  const s = stats.data;
+  const o = ops.data;
+  const f = fin.data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-4xl">Dashboard</h1>
         <p className="text-muted-foreground">Visão geral da operação</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat Icon={ShoppingBag} label="Pedidos hoje" value={s?.todayOrders ?? 0} />
-        <Stat Icon={DollarSign} label="Receita hoje" value={formatKwanza(s?.todayRevenue ?? 0)} />
-        <Stat Icon={TrendingUp} label="Receita do mês" value={formatKwanza(s?.monthRevenue ?? 0)} />
-        <Stat Icon={Users} label="Clientes" value={s?.customers ?? 0} />
-      </div>
+      <section>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Operacional — hoje
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat Icon={ShoppingBag} label="Pedidos recebidos hoje" value={o?.receivedToday ?? 0} />
+          <Stat Icon={Clock} label="Pedidos pendentes" value={o?.pending ?? 0} tone="warn" />
+          <Stat Icon={CheckCircle2} label="Finalizados hoje" value={o?.completedToday ?? 0} tone="success" />
+          <Stat Icon={XCircle} label="Cancelados hoje" value={o?.cancelledToday ?? 0} tone="danger" />
+        </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Stat Icon={ShoppingBag} label="Total de pedidos" value={s?.totalOrders ?? 0} />
-        <Stat Icon={DollarSign} label="Receita total" value={formatKwanza(s?.totalRevenue ?? 0)} />
-        <Stat Icon={TrendingUp} label="Ticket médio" value={formatKwanza(s?.avgTicket ?? 0)} />
-      </div>
+      <section>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Financeiro — apenas pedidos finalizados
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Stat Icon={DollarSign} label="Receita de hoje" value={formatKwanza(f?.todayRevenue ?? 0)} />
+          <Stat Icon={TrendingUp} label="Receita do mês" value={formatKwanza(f?.monthRevenue ?? 0)} />
+          <Stat Icon={DollarSign} label="Receita total" value={formatKwanza(f?.totalRevenue ?? 0)} />
+          <Stat Icon={Receipt} label="Total de vendas" value={f?.totalSales ?? 0} />
+          <Stat Icon={TrendingUp} label="Ticket médio" value={formatKwanza(f?.avgTicket ?? 0)} />
+          <Stat Icon={Users} label="Clientes" value={f?.customers ?? 0} />
+        </div>
+      </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-card">
-        <h2 className="mb-4 font-display text-2xl">Pedidos recentes</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-2xl">Pedidos recentes</h2>
+          <Link to="/admin/pedidos" className="text-sm font-semibold text-primary hover:underline">
+            Ver todos
+          </Link>
+        </div>
         {recent.data && recent.data.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -134,15 +198,25 @@ function Stat({
   Icon,
   label,
   value,
+  tone,
 }: {
   Icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string | number;
+  tone?: "success" | "warn" | "danger";
 }) {
+  const toneCls =
+    tone === "success"
+      ? "bg-success/10 text-success"
+      : tone === "warn"
+        ? "bg-chart-3/15 text-chart-3"
+        : tone === "danger"
+          ? "bg-destructive/10 text-destructive"
+          : "bg-primary/10 text-primary";
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center gap-3">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
+        <div className={`grid h-12 w-12 place-items-center rounded-full ${toneCls}`}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
@@ -157,7 +231,9 @@ function Stat({
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     received: { label: "Recebido", cls: "bg-primary/10 text-primary" },
+    confirmed: { label: "Confirmado", cls: "bg-chart-2/15 text-chart-2" },
     preparing: { label: "Em preparo", cls: "bg-chart-3/15 text-chart-3" },
+    ready: { label: "Pronto", cls: "bg-chart-4/15 text-chart-4" },
     out_for_delivery: { label: "Saiu p/ entrega", cls: "bg-chart-4/15 text-chart-4" },
     completed: { label: "Finalizado", cls: "bg-success/15 text-success" },
     cancelled: { label: "Cancelado", cls: "bg-destructive/15 text-destructive" },

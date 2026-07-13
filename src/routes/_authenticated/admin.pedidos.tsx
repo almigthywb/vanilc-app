@@ -14,12 +14,27 @@ export const Route = createFileRoute("/_authenticated/admin/pedidos")({
 
 const STATUSES = [
   { value: "all", label: "Todos" },
+  { value: "pending", label: "Pendentes" },
   { value: "received", label: "Recebido" },
+  { value: "confirmed", label: "Confirmado" },
   { value: "preparing", label: "Em preparo" },
+  { value: "ready", label: "Pronto" },
+  { value: "out_for_delivery", label: "Saiu p/ entrega" },
+  { value: "completed", label: "Finalizados" },
+  { value: "cancelled", label: "Cancelados" },
+] as const;
+
+const REAL_STATUSES = [
+  { value: "received", label: "Recebido" },
+  { value: "confirmed", label: "Confirmado" },
+  { value: "preparing", label: "Em preparo" },
+  { value: "ready", label: "Pronto" },
   { value: "out_for_delivery", label: "Saiu p/ entrega" },
   { value: "completed", label: "Finalizado" },
   { value: "cancelled", label: "Cancelado" },
 ] as const;
+
+const PENDING_STATUSES = ["received", "confirmed", "preparing", "ready", "out_for_delivery"] as const;
 
 const PERIODS = [
   { value: "today", label: "Hoje" },
@@ -40,7 +55,11 @@ function OrdersPage() {
         .from("orders")
         .select("*")
         .order("created_at", { ascending: false });
-      if (status !== "all") q = q.eq("status", status as never);
+      if (status === "pending") {
+        q = q.in("status", [...PENDING_STATUSES]);
+      } else if (status !== "all") {
+        q = q.eq("status", status as never);
+      }
       const since = periodSince(period);
       if (since) q = q.gte("created_at", since.toISOString());
       const { data, error } = await q;
@@ -196,6 +215,11 @@ function OrderModal({ id, onClose }: { id: string; onClose: () => void }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-order", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-ops"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-fin"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-cancelled-orders"] });
       toast.success("Status atualizado");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
@@ -265,7 +289,7 @@ function OrderModal({ id, onClose }: { id: string; onClose: () => void }) {
                 Alterar status
               </p>
               <div className="flex flex-wrap gap-2">
-                {STATUSES.filter((s) => s.value !== "all").map((s) => (
+                {REAL_STATUSES.map((s) => (
                   <Button
                     key={s.value}
                     variant={o.status === s.value ? "default" : "outline"}

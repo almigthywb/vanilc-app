@@ -155,6 +155,8 @@ export type Database = {
       orders: {
         Row: {
           address: string | null
+          cancelled_at: string | null
+          completed_at: string | null
           created_at: string
           customer_first_name: string
           customer_id: string | null
@@ -172,6 +174,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
           created_at?: string
           customer_first_name: string
           customer_id?: string | null
@@ -189,6 +193,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
           created_at?: string
           customer_first_name?: string
           customer_id?: string | null
@@ -430,7 +436,9 @@ export type Database = {
       delivery_type: "pickup" | "city" | "outside"
       order_status:
         | "received"
+        | "confirmed"
         | "preparing"
+        | "ready"
         | "out_for_delivery"
         | "completed"
         | "cancelled"
@@ -566,7 +574,9 @@ export const Constants = {
       delivery_type: ["pickup", "city", "outside"],
       order_status: [
         "received",
+        "confirmed",
         "preparing",
+        "ready",
         "out_for_delivery",
         "completed",
         "cancelled",
