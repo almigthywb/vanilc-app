@@ -17,7 +17,9 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: DashboardPage,
 });
 
-const PENDING_STATUSES = ["received", "confirmed", "preparing", "ready", "out_for_delivery"] as const;
+const PENDING_STATUSES = ["received", "confirmed", "preparing", "ready", "out_for_delivery"] as const satisfies ReadonlyArray<
+  "received" | "confirmed" | "preparing" | "ready" | "out_for_delivery"
+>;
 
 function DashboardPage() {
   const ops = useQuery({
