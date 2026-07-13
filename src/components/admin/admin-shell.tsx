@@ -31,7 +31,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 const NAV: Array<{ to: string; label: string; Icon: React.ComponentType<{ className?: string }>; exact?: boolean }> = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
-  { to: "/admin/pedidos", label: "Pedidos", Icon: ShoppingBag },
+  { to: "/admin/pedidos", label: "Pedidos", Icon: ShoppingBag, exact: true },
+  { to: "/admin/pedidos-cancelados", label: "Cancelados", Icon: XCircle },
   { to: "/admin/produtos", label: "Produtos", Icon: Beef },
   { to: "/admin/categorias", label: "Categorias", Icon: FolderTree },
   { to: "/admin/clientes", label: "Clientes", Icon: Users },
