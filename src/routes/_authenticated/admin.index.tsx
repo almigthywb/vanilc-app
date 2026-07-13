@@ -38,7 +38,7 @@ function DashboardPage() {
         supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
-          .in("status", PENDING_STATUSES as unknown as string[]),
+          .in("status", [...PENDING_STATUSES]),
         supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
