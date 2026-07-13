@@ -215,6 +215,11 @@ function OrderModal({ id, onClose }: { id: string; onClose: () => void }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       queryClient.invalidateQueries({ queryKey: ["admin-order", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-ops"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-fin"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-cancelled-orders"] });
       toast.success("Status atualizado");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
