@@ -14,12 +14,27 @@ export const Route = createFileRoute("/_authenticated/admin/pedidos")({
 
 const STATUSES = [
   { value: "all", label: "Todos" },
+  { value: "pending", label: "Pendentes" },
   { value: "received", label: "Recebido" },
+  { value: "confirmed", label: "Confirmado" },
   { value: "preparing", label: "Em preparo" },
+  { value: "ready", label: "Pronto" },
+  { value: "out_for_delivery", label: "Saiu p/ entrega" },
+  { value: "completed", label: "Finalizados" },
+  { value: "cancelled", label: "Cancelados" },
+] as const;
+
+const REAL_STATUSES = [
+  { value: "received", label: "Recebido" },
+  { value: "confirmed", label: "Confirmado" },
+  { value: "preparing", label: "Em preparo" },
+  { value: "ready", label: "Pronto" },
   { value: "out_for_delivery", label: "Saiu p/ entrega" },
   { value: "completed", label: "Finalizado" },
   { value: "cancelled", label: "Cancelado" },
 ] as const;
+
+const PENDING_STATUSES = ["received", "confirmed", "preparing", "ready", "out_for_delivery"] as const;
 
 const PERIODS = [
   { value: "today", label: "Hoje" },
