@@ -31,16 +31,9 @@ export function CategorySidebar({ categories, mobileOpen, onCloseMobile }: Props
       >
         <Home className="h-5 w-5" /> Início
       </Link>
-      <Link
-        to="/cardapio/$slug"
-        params={{ slug: "promocoes" }}
-        onClick={onCloseMobile}
-        className={navLinkClass(path === "/cardapio/promocoes") + " !text-primary"}
-      >
-        <Flame className="h-5 w-5" /> Promoções
-      </Link>
       {categories.map((cat) => {
-        const Icon = ICONS[cat.slug] ?? Beef;
+        const isPromo = cat.slug === "promocoes";
+        const Icon = isPromo ? Flame : (ICONS[cat.slug] ?? Beef);
         const active = path === `/cardapio/${cat.slug}`;
         return (
           <Link
