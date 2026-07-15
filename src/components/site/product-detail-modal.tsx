@@ -19,8 +19,14 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
   const isMobile = useIsMobile();
   const { data: categories } = useQuery(categoriesQuery);
   const category = categories?.find((c) => c.id === product.category_id);
-  const price =
-    product.is_promo && product.promo_price ? product.promo_price : product.price;
+  const onPromo =
+    product.is_promo && product.promo_price != null && product.promo_price < product.price;
+  const price = onPromo ? Number(product.promo_price) : Number(product.price);
+  const percent = onPromo
+    ? product.discount_percent ??
+      Math.round((1 - Number(product.promo_price) / Number(product.price)) * 100)
+    : 0;
+  const saved = onPromo ? Number(product.price) - Number(product.promo_price) : 0;
 
   const handleAdd = () => {
     cart.add({
