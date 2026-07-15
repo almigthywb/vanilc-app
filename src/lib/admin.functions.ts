@@ -58,7 +58,7 @@ const ProductInput = z.object({
   available: z.boolean(),
   is_featured: z.boolean(),
   is_promo: z.boolean(),
-  promo_price: z.number().nonnegative().nullable(),
+  discount_percent: z.number().int().min(0).max(100).nullable(),
   weight_label: z.string().nullable(),
 });
 

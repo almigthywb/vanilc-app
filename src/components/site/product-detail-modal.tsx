@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { X, ShoppingCart } from "lucide-react";
+import { X, ShoppingCart, Flame } from "lucide-react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { resolveProductImage } from "@/lib/product-images";
 import { formatKwanza } from "@/lib/format";
@@ -19,8 +19,14 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
   const isMobile = useIsMobile();
   const { data: categories } = useQuery(categoriesQuery);
   const category = categories?.find((c) => c.id === product.category_id);
-  const price =
-    product.is_promo && product.promo_price ? product.promo_price : product.price;
+  const onPromo =
+    product.is_promo && product.promo_price != null && product.promo_price < product.price;
+  const price = onPromo ? Number(product.promo_price) : Number(product.price);
+  const percent = onPromo
+    ? product.discount_percent ??
+      Math.round((1 - Number(product.promo_price) / Number(product.price)) * 100)
+    : 0;
+  const saved = onPromo ? Number(product.price) - Number(product.promo_price) : 0;
 
   const handleAdd = () => {
     cart.add({
@@ -100,9 +106,10 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                 alt={product.name}
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
-              {product.is_promo && (
-                <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground shadow-lg">
-                  Promoção
+              {onPromo && (
+                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-primary/80 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg ring-1 ring-primary/20">
+                  <Flame className="h-3.5 w-3.5" strokeWidth={2.5} />
+                  -{percent}% OFF
                 </span>
               )}
             </div>
@@ -127,8 +134,8 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                 </p>
               )}
 
-              <div className="mt-5 flex items-baseline gap-3">
-                {product.is_promo && product.promo_price && (
+              <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                {onPromo && (
                   <span className="text-base text-muted-foreground line-through">
                     {formatKwanza(product.price)}
                   </span>
@@ -136,7 +143,17 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                 <span className="text-3xl font-extrabold text-primary sm:text-4xl">
                   {formatKwanza(price)}
                 </span>
+                {onPromo && (
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                    -{percent}%
+                  </span>
+                )}
               </div>
+              {onPromo && (
+                <p className="mt-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                  Economize {formatKwanza(saved)}
+                </p>
+              )}
 
               {/* Desktop-only inline actions */}
               {!isMobile && (
