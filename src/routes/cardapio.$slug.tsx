@@ -53,9 +53,18 @@ function CategoryContent() {
   const { slug } = Route.useParams();
   const { data: categories } = useSuspenseQuery(categoriesQuery);
   const { data: products } = useSuspenseQuery(productsQuery);
-  const category = categories.find((c) => c.slug === slug);
+
+  const isPromoView = slug === "promocoes";
+  const category = isPromoView
+    ? { id: "__promo__", name: "Promoções", slug: "promocoes" }
+    : categories.find((c) => c.slug === slug);
   if (!category) throw notFound();
-  const items = products.filter((p) => p.category_id === category.id);
+
+  const items = isPromoView
+    ? products.filter(
+        (p) => p.is_promo && p.promo_price != null && p.promo_price < p.price && p.available,
+      )
+    : products.filter((p) => p.category_id === category.id);
 
   return (
     <div className="space-y-6 pb-12">
