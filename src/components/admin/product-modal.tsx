@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { resolveProductImage } from "@/lib/product-images";
+import { formatKwanza } from "@/lib/format";
 import { saveAdminProduct, uploadAdminMedia } from "@/lib/admin.functions";
 
 export interface ProductForm {
@@ -17,7 +18,7 @@ export interface ProductForm {
   available: boolean;
   is_featured: boolean;
   is_promo: boolean;
-  promo_price: number | null;
+  discount_percent: number | null;
   weight_label: string;
 }
 
@@ -30,7 +31,7 @@ export const EMPTY_PRODUCT: ProductForm = {
   available: true,
   is_featured: false,
   is_promo: false,
-  promo_price: null,
+  discount_percent: null,
   weight_label: "",
 };
 
@@ -52,8 +53,18 @@ export function ProductModal({
   const saveProduct = useServerFn(saveAdminProduct);
   const uploadMedia = useServerFn(uploadAdminMedia);
 
+  const discount = f.is_promo ? Math.max(0, Math.min(100, f.discount_percent ?? 0)) : 0;
+  const promoPrice = f.is_promo && discount > 0 ? Math.round(f.price * (1 - discount / 100)) : null;
+  const discountInvalid =
+    f.is_promo &&
+    (f.discount_percent === null ||
+      Number.isNaN(f.discount_percent) ||
+      f.discount_percent < 0 ||
+      f.discount_percent > 100);
+
   const save = useMutation({
     mutationFn: async () => {
+      if (discountInvalid) throw new Error("Percentual de desconto deve ser entre 0 e 100");
       const payload = {
         name: f.name,
         description: f.description || null,
@@ -63,7 +74,7 @@ export function ProductModal({
         available: f.available,
         is_featured: f.is_featured,
         is_promo: f.is_promo,
-        promo_price: f.is_promo ? f.promo_price : null,
+        discount_percent: f.is_promo ? f.discount_percent : null,
         weight_label: f.weight_label || null,
       };
       if (f.id) {
@@ -166,18 +177,58 @@ export function ProductModal({
           <div className="grid gap-2">
             <Toggle label="Disponível" checked={f.available} onChange={(v) => setF({ ...f, available: v })} />
             <Toggle label="Destaque" checked={f.is_featured} onChange={(v) => setF({ ...f, is_featured: v })} />
-            <Toggle label="Em promoção" checked={f.is_promo} onChange={(v) => setF({ ...f, is_promo: v })} />
+            <Toggle
+              label="Em promoção"
+              checked={f.is_promo}
+              onChange={(v) =>
+                setF({ ...f, is_promo: v, discount_percent: v ? (f.discount_percent ?? 10) : null })
+              }
+            />
             {f.is_promo && (
-              <Field label="Preço promocional (Kz)">
-                <input type="number" min={0} className={inputClass} value={f.promo_price ?? 0}
-                  onChange={(e) => setF({ ...f, promo_price: Number(e.target.value) })} />
-              </Field>
+              <div className="rounded-2xl border border-primary/30 bg-primary/5 p-3 space-y-2">
+                <Field label="Percentual de desconto (%)">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    required
+                    className={inputClass}
+                    value={f.discount_percent ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setF({ ...f, discount_percent: v === "" ? null : Number(v) });
+                    }}
+                    placeholder="20"
+                  />
+                </Field>
+                {discountInvalid && (
+                  <p className="text-xs font-medium text-destructive">
+                    O desconto deve ser um número entre 0 e 100.
+                  </p>
+                )}
+                <div className="flex items-baseline justify-between gap-3 pt-1">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Preço promocional
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    {promoPrice !== null && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        {formatKwanza(f.price)}
+                      </span>
+                    )}
+                    <span className="text-lg font-extrabold text-primary">
+                      {formatKwanza(promoPrice ?? f.price)}
+                    </span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={save.isPending}>
+            <Button type="submit" disabled={save.isPending || discountInvalid}>
               {save.isPending ? "Salvando..." : "Salvar"}
             </Button>
           </div>
