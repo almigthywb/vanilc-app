@@ -18,6 +18,7 @@ export interface Product {
   price: number;
   promo_price: number | null;
   is_promo: boolean;
+  discount_percent: number | null;
   image_url: string | null;
   available: boolean;
   is_featured: boolean;
