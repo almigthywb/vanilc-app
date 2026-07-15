@@ -189,7 +189,7 @@ function CategoryProductsPage() {
     available: p.available,
     is_featured: p.is_featured,
     is_promo: p.is_promo,
-    promo_price: p.promo_price !== null ? Number(p.promo_price) : null,
+    discount_percent: p.discount_percent,
     weight_label: p.weight_label ?? "",
   });
 
