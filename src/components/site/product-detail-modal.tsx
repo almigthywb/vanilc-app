@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { X, ShoppingCart } from "lucide-react";
+import { X, ShoppingCart, Flame } from "lucide-react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { resolveProductImage } from "@/lib/product-images";
 import { formatKwanza } from "@/lib/format";
