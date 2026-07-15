@@ -60,6 +60,7 @@ interface ProductRow {
   is_featured: boolean;
   is_promo: boolean;
   promo_price: number | null;
+  discount_percent: number | null;
   weight_label: string | null;
   sort_order: number;
   created_at?: string | null;
