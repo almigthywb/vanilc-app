@@ -48,26 +48,21 @@ export const createOrder = createServerFn({ method: "POST" })
           : Number(settings.delivery_fee_outside);
     const total = subtotal + deliveryFee;
 
-    // Upsert customer
+    // Upsert customer by NORMALIZED phone (single source of truth for identity)
+    const normalized = data.phone.replace(/[^0-9]/g, "");
+    const normalizedPhone =
+      normalized.length === 9 && normalized.startsWith("9") ? "244" + normalized : normalized;
+
     let customerId: string | null = null;
     const { data: existing } = await supabase
       .from("customers")
-      .select("id, total_orders, total_spent")
-      .eq("phone", data.phone)
+      .select("id")
+      .eq("normalized_phone", normalizedPhone)
       .maybeSingle();
 
-    // Customer stats (total_orders, total_spent, last_order_at) are updated
-    // by a database trigger ONLY when the order is marked as 'completed'.
-    // Here we just keep name/phone in sync.
     if (existing) {
       customerId = existing.id;
-      await supabase
-        .from("customers")
-        .update({
-          first_name: data.firstName,
-          last_name: data.lastName,
-        })
-        .eq("id", existing.id);
+      // Do NOT overwrite the saved name/phone of a returning customer.
     } else {
       const { data: inserted, error: cErr } = await supabase
         .from("customers")

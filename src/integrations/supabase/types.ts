@@ -74,31 +74,46 @@ export type Database = {
       customers: {
         Row: {
           created_at: string
+          customer_number: number
           first_name: string
+          first_order_at: string | null
           id: string
           last_name: string | null
           last_order_at: string | null
+          normalized_phone: string | null
+          notes: string | null
           phone: string
+          status: string
           total_orders: number
           total_spent: number
         }
         Insert: {
           created_at?: string
+          customer_number?: number
           first_name: string
+          first_order_at?: string | null
           id?: string
           last_name?: string | null
           last_order_at?: string | null
+          normalized_phone?: string | null
+          notes?: string | null
           phone: string
+          status?: string
           total_orders?: number
           total_spent?: number
         }
         Update: {
           created_at?: string
+          customer_number?: number
           first_name?: string
+          first_order_at?: string | null
           id?: string
           last_name?: string | null
           last_order_at?: string | null
+          normalized_phone?: string | null
+          notes?: string | null
           phone?: string
+          status?: string
           total_orders?: number
           total_spent?: number
         }
@@ -432,7 +447,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      normalize_phone: { Args: { p: string }; Returns: string }
     }
     Enums: {
       app_role: "admin"
