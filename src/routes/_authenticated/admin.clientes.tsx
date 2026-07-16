@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Search, Users, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
-import { formatCustomerNumber, formatPhonePretty, normalizePhone } from "@/lib/phone";
+import { formatCustomerNumber, formatPhonePretty } from "@/lib/phone";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes")({
   component: CustomersPage,
