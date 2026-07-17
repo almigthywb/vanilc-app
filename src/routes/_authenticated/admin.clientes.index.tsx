@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
 import { formatCustomerNumber, formatPhonePretty } from "@/lib/phone";
 
-export const Route = createFileRoute("/_authenticated/admin/clientes")({
+export const Route = createFileRoute("/_authenticated/admin/clientes/")({
   component: CustomersPage,
 });
 
