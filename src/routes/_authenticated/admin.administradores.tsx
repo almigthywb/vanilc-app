@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Trash2, ShieldCheck, UserPlus, Loader2, Mail, Calendar, Clock } from "lucide-react";
 import { z } from "zod";
@@ -51,6 +51,8 @@ function AdminsPage() {
   const [confirm, setConfirm] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toRemove, setToRemove] = useState<{ userId: string; email: string } | null>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const createMut = useMutation({
     mutationFn: (d: { email: string; password: string }) => create({ data: d }),
@@ -60,7 +62,9 @@ function AdminsPage() {
       setPassword("");
       setConfirm("");
       setErrors({});
+      formRef.current?.reset();
       qc.invalidateQueries({ queryKey: ["admins-list"] });
+      requestAnimationFrame(() => emailRef.current?.focus());
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao adicionar."),
   });
