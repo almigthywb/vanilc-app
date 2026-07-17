@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPedidosCanceladosRouteImport } from './routes/_authenticated/admin.pedidos-cancelados'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminAdministradoresRouteImport } from './routes/_authenticated/admin.administradores'
 import { Route as AuthenticatedAdminProdutosIndexRouteImport } from './routes/_authenticated/admin.produtos.index'
@@ -92,6 +93,12 @@ const AuthenticatedAdminConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCategoriasRoute =
   AuthenticatedAdminCategoriasRouteImport.update({
     id: '/categorias',
@@ -112,9 +119,9 @@ const AuthenticatedAdminProdutosIndexRoute =
   } as any)
 const AuthenticatedAdminClientesIndexRoute =
   AuthenticatedAdminClientesIndexRouteImport.update({
-    id: '/clientes/',
-    path: '/clientes/',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
   } as any)
 const AuthenticatedAdminProdutosCategoryIdRoute =
   AuthenticatedAdminProdutosCategoryIdRouteImport.update({
@@ -124,9 +131,9 @@ const AuthenticatedAdminProdutosCategoryIdRoute =
   } as any)
 const AuthenticatedAdminClientesIdRoute =
   AuthenticatedAdminClientesIdRouteImport.update({
-    id: '/clientes/$id',
-    path: '/clientes/$id',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/cardapio/$slug': typeof CardapioSlugRoute
   '/admin/administradores': typeof AuthenticatedAdminAdministradoresRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRouteWithChildren
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/pedidos-cancelados': typeof AuthenticatedAdminPedidosCanceladosRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/cardapio/$slug': typeof CardapioSlugRoute
   '/_authenticated/admin/administradores': typeof AuthenticatedAdminAdministradoresRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRouteWithChildren
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/pedidos-cancelados': typeof AuthenticatedAdminPedidosCanceladosRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/cardapio/$slug'
     | '/admin/administradores'
     | '/admin/categorias'
+    | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/pedidos'
     | '/admin/pedidos-cancelados'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/cardapio/$slug'
     | '/_authenticated/admin/administradores'
     | '/_authenticated/admin/categorias'
+    | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/pedidos-cancelados'
@@ -339,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/categorias': {
       id: '/_authenticated/admin/categorias'
       path: '/categorias'
@@ -362,10 +380,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/clientes/': {
       id: '/_authenticated/admin/clientes/'
-      path: '/clientes'
+      path: '/'
       fullPath: '/admin/clientes/'
       preLoaderRoute: typeof AuthenticatedAdminClientesIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedAdminClientesRoute
     }
     '/_authenticated/admin/produtos/$categoryId': {
       id: '/_authenticated/admin/produtos/$categoryId'
@@ -376,13 +394,29 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/clientes/$id': {
       id: '/_authenticated/admin/clientes/$id'
-      path: '/clientes/$id'
+      path: '/$id'
       fullPath: '/admin/clientes/$id'
       preLoaderRoute: typeof AuthenticatedAdminClientesIdRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedAdminClientesRoute
     }
   }
 }
+
+interface AuthenticatedAdminClientesRouteChildren {
+  AuthenticatedAdminClientesIdRoute: typeof AuthenticatedAdminClientesIdRoute
+  AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
+}
+
+const AuthenticatedAdminClientesRouteChildren: AuthenticatedAdminClientesRouteChildren =
+  {
+    AuthenticatedAdminClientesIdRoute: AuthenticatedAdminClientesIdRoute,
+    AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
+  }
+
+const AuthenticatedAdminClientesRouteWithChildren =
+  AuthenticatedAdminClientesRoute._addFileChildren(
+    AuthenticatedAdminClientesRouteChildren,
+  )
 
 interface AuthenticatedAdminProdutosRouteChildren {
   AuthenticatedAdminProdutosCategoryIdRoute: typeof AuthenticatedAdminProdutosCategoryIdRoute
@@ -404,20 +438,20 @@ const AuthenticatedAdminProdutosRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdministradoresRoute: typeof AuthenticatedAdminAdministradoresRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRouteWithChildren
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminPedidosCanceladosRoute: typeof AuthenticatedAdminPedidosCanceladosRoute
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRouteWithChildren
   AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedAdminClientesIdRoute: typeof AuthenticatedAdminClientesIdRoute
-  AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdministradoresRoute:
     AuthenticatedAdminAdministradoresRoute,
   AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
+  AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRouteWithChildren,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminPedidosCanceladosRoute:
@@ -425,8 +459,6 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRouteWithChildren,
   AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-  AuthenticatedAdminClientesIdRoute: AuthenticatedAdminClientesIdRoute,
-  AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
