@@ -114,12 +114,14 @@ function AdminsPage() {
           <UserPlus className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">Adicionar novo administrador</h2>
         </div>
-        <form onSubmit={submit} className="grid gap-4 sm:grid-cols-3">
+        <form ref={formRef} onSubmit={submit} autoComplete="off" className="grid gap-4 sm:grid-cols-3">
           <div className="sm:col-span-3">
             <Label htmlFor="email">E-mail</Label>
             <Input
               id="email"
+              ref={emailRef}
               type="email"
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@exemplo.com"
