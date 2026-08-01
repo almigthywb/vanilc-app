@@ -88,7 +88,7 @@ function HomeContent() {
       {/* Destaques */}
       <section>
         <SectionHeader title="Destaques" linkTo="carnes" showLink={allFeatured.length > FEATURED_LIMIT} />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="motion-stagger grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {featured.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -99,7 +99,7 @@ function HomeContent() {
       {combos.length > 0 && (
         <section>
           <SectionHeader title="Combos especiais" linkTo="combos" showLink={allCombos.length > COMBOS_LIMIT} />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="motion-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {combos.map((p) => (
               <ProductCard key={p.id} product={p} variant="wide" />
             ))}
@@ -109,7 +109,7 @@ function HomeContent() {
 
       {/* Trust badges */}
       <section className="rounded-2xl bg-accent/60 p-4 sm:p-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="motion-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { Icon: Award, title: "Carnes selecionadas", desc: "Qualidade premium" },
             { Icon: Truck, title: "Entrega rápida", desc: "No conforto da sua casa" },
