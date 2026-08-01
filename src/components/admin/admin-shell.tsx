@@ -23,6 +23,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/vanilc-logo.png";
 import { SiteFooter } from "@/components/site/site-footer";
+import { PageTransition } from "@/components/motion/page-transition";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { settingsQuery } from "@/lib/queries";
@@ -249,7 +250,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         )}
 
-        <main className="p-4 sm:p-6">{isAdmin ? children : null}</main>
+        <main className="p-4 sm:p-6">{isAdmin ? <PageTransition>{children}</PageTransition> : null}</main>
         <SiteFooter />
       </div>
       <Toaster position="top-center" />
