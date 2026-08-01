@@ -5,6 +5,7 @@ import { Search, Users, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
 import { formatCustomerNumber, formatPhonePretty } from "@/lib/phone";
+import { TableSkeleton } from "@/components/motion/skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/")({
   component: CustomersPage,
@@ -64,6 +65,11 @@ function CustomersPage() {
       </div>
 
       <div className="rounded-2xl border border-border bg-card shadow-card">
+        {customers.isLoading ? (
+          <div className="p-5">
+            <TableSkeleton rows={6} cols={6} />
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase text-muted-foreground">
@@ -79,9 +85,9 @@ function CustomersPage() {
                 <th className="px-4 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="motion-stagger divide-y divide-border">
               {filtered.map((c) => (
-                <tr key={c.id} className="hover:bg-muted/40">
+                <tr key={c.id} className="transition-colors hover:bg-muted/40">
                   <td className="px-4 py-3 font-bold text-primary tabular-nums">
                     {formatCustomerNumber(c.customer_number)}
                   </td>
@@ -133,6 +139,7 @@ function CustomersPage() {
             </p>
           )}
         </div>
+        )}
       </div>
     </div>
   );
