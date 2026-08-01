@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
+import { AnimatedCounter } from "@/components/motion/animated-counter";
+import { StatGridSkeleton, TableSkeleton } from "@/components/motion/skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: DashboardPage,
@@ -126,26 +128,34 @@ function DashboardPage() {
         <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Operacional — hoje
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat Icon={ShoppingBag} label="Pedidos recebidos hoje" value={o?.receivedToday ?? 0} />
-          <Stat Icon={Clock} label="Pedidos pendentes" value={o?.pending ?? 0} tone="warn" />
-          <Stat Icon={CheckCircle2} label="Finalizados hoje" value={o?.completedToday ?? 0} tone="success" />
-          <Stat Icon={XCircle} label="Cancelados hoje" value={o?.cancelledToday ?? 0} tone="danger" />
-        </div>
+        {ops.isLoading ? (
+          <StatGridSkeleton count={4} />
+        ) : (
+          <div className="motion-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat Icon={ShoppingBag} label="Pedidos recebidos hoje" value={o?.receivedToday ?? 0} />
+            <Stat Icon={Clock} label="Pedidos pendentes" value={o?.pending ?? 0} tone="warn" />
+            <Stat Icon={CheckCircle2} label="Finalizados hoje" value={o?.completedToday ?? 0} tone="success" />
+            <Stat Icon={XCircle} label="Cancelados hoje" value={o?.cancelledToday ?? 0} tone="danger" />
+          </div>
+        )}
       </section>
 
       <section>
         <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Financeiro — apenas pedidos finalizados
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Stat Icon={DollarSign} label="Receita de hoje" value={formatKwanza(f?.todayRevenue ?? 0)} />
-          <Stat Icon={TrendingUp} label="Receita do mês" value={formatKwanza(f?.monthRevenue ?? 0)} />
-          <Stat Icon={DollarSign} label="Receita total" value={formatKwanza(f?.totalRevenue ?? 0)} />
-          <Stat Icon={Receipt} label="Total de vendas" value={f?.totalSales ?? 0} />
-          <Stat Icon={TrendingUp} label="Ticket médio" value={formatKwanza(f?.avgTicket ?? 0)} />
-          <Stat Icon={Users} label="Clientes" value={f?.customers ?? 0} />
-        </div>
+        {fin.isLoading ? (
+          <StatGridSkeleton count={6} />
+        ) : (
+          <div className="motion-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Stat Icon={DollarSign} label="Receita de hoje" value={f?.todayRevenue ?? 0} format={formatKwanza} />
+            <Stat Icon={TrendingUp} label="Receita do mês" value={f?.monthRevenue ?? 0} format={formatKwanza} />
+            <Stat Icon={DollarSign} label="Receita total" value={f?.totalRevenue ?? 0} format={formatKwanza} />
+            <Stat Icon={Receipt} label="Total de vendas" value={f?.totalSales ?? 0} />
+            <Stat Icon={TrendingUp} label="Ticket médio" value={f?.avgTicket ?? 0} format={formatKwanza} />
+            <Stat Icon={Users} label="Clientes" value={f?.customers ?? 0} />
+          </div>
+        )}
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-card">
@@ -155,7 +165,9 @@ function DashboardPage() {
             Ver todos
           </Link>
         </div>
-        {recent.data && recent.data.length > 0 ? (
+        {recent.isLoading ? (
+          <TableSkeleton rows={5} cols={5} />
+        ) : recent.data && recent.data.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase text-muted-foreground">
@@ -167,9 +179,9 @@ function DashboardPage() {
                   <th className="pb-2 text-right">Total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="motion-stagger divide-y divide-border">
                 {recent.data.map((o) => (
-                  <tr key={o.id}>
+                  <tr key={o.id} className="transition-colors hover:bg-muted/40">
                     <td className="py-3 pr-3 font-bold text-primary">#{o.order_number}</td>
                     <td className="py-3 pr-3">{o.customer_first_name}</td>
                     <td className="py-3 pr-3">
@@ -199,11 +211,13 @@ function Stat({
   label,
   value,
   tone,
+  format,
 }: {
   Icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string | number;
+  value: number;
   tone?: "success" | "warn" | "danger";
+  format?: (n: number) => string;
 }) {
   const toneCls =
     tone === "success"
@@ -214,14 +228,16 @@ function Stat({
           ? "bg-destructive/10 text-destructive"
           : "bg-primary/10 text-primary";
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+    <div className="motion-card rounded-2xl border border-border bg-card p-5 shadow-card hover:-translate-y-0.5 hover:shadow-elegant">
       <div className="flex items-center gap-3">
         <div className={`grid h-12 w-12 place-items-center rounded-full ${toneCls}`}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-          <p className="truncate text-xl font-extrabold text-foreground">{value}</p>
+          <p className="truncate text-xl font-extrabold text-foreground">
+            <AnimatedCounter value={value} format={format} />
+          </p>
         </div>
       </div>
     </div>
@@ -240,7 +256,10 @@ export function StatusBadge({ status }: { status: string }) {
   };
   const m = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${m.cls}`}>
+    <span
+      key={status}
+      className={`motion-pop inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors ${m.cls}`}
+    >
       {m.label}
     </span>
   );

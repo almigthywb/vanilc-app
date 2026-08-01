@@ -58,7 +58,7 @@ export function ProductCard({ product, variant = "compact" }: Props) {
           tabIndex={0}
           onClick={openModal}
           onKeyDown={onKey}
-          className="group relative flex cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:shadow-flame focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="motion-card group relative flex cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-card hover:-translate-y-0.5 hover:shadow-flame focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <div className="relative h-32 w-32 shrink-0 sm:h-36 sm:w-36">
             <img
@@ -114,7 +114,7 @@ export function ProductCard({ product, variant = "compact" }: Props) {
         tabIndex={0}
         onClick={openModal}
         onKeyDown={onKey}
-        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:-translate-y-0.5 hover:shadow-flame focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="motion-card group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-card hover:-translate-y-1 hover:shadow-flame focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img

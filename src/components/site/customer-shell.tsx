@@ -6,6 +6,7 @@ import { SiteFooter } from "./site-footer";
 import { CategorySidebar } from "./category-sidebar";
 import { CartDrawer } from "./cart-drawer";
 import { categoriesQuery, settingsQuery } from "@/lib/queries";
+import { PageTransition } from "@/components/motion/page-transition";
 
 export function CustomerShell({ children }: { children: ReactNode }) {
   const { data: categories } = useSuspenseQuery(categoriesQuery);
@@ -31,7 +32,9 @@ export function CustomerShell({ children }: { children: ReactNode }) {
           mobileOpen={menuOpen}
           onCloseMobile={() => setMenuOpen(false)}
         />
-        <main className="min-w-0 flex-1 p-3 sm:p-6">{children}</main>
+        <main className="min-w-0 flex-1 p-3 sm:p-6">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
 
       <SiteFooter />

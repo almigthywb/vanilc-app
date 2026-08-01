@@ -60,7 +60,10 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
           >
             <ShoppingCart className="h-5 w-5" />
             {count > 0 && (
-              <span className="ml-1 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary">
+              <span
+                key={count}
+                className="motion-count-pop ml-1 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary"
+              >
                 {count}
               </span>
             )}
@@ -125,7 +128,10 @@ export function SiteHeader({ onOpenCart, onOpenMenu }: Props) {
             <ShoppingCart className="h-5 w-5" />
             <span className="ml-2">Carrinho</span>
             {count > 0 && (
-              <span className="ml-2 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary">
+              <span
+                key={count}
+                className="motion-count-pop ml-2 grid h-6 w-6 place-items-center rounded-full bg-card text-xs font-bold text-primary"
+              >
                 {count}
               </span>
             )}
