@@ -311,3 +311,69 @@ export const removeAdmin = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+// ---------- Delivery zones ----------
+const ZoneInput = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(1).max(100),
+  fee: z.number().nonnegative().max(10_000_000),
+  active: z.boolean().optional(),
+  display_order: z.number().int().optional(),
+});
+
+export const saveDeliveryZone = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ZoneInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { id, ...rest } = data;
+    if (id) {
+      const { error } = await supabaseAdmin.from("delivery_zones").update(rest).eq("id", id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { data: last } = await supabaseAdmin
+        .from("delivery_zones")
+        .select("display_order")
+        .order("display_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const { error } = await supabaseAdmin.from("delivery_zones").insert({
+        name: rest.name,
+        fee: rest.fee,
+        active: rest.active ?? true,
+        display_order: (last?.display_order ?? 0) + 1,
+      });
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+export const deleteDeliveryZone = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("delivery_zones").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const reorderDeliveryZones = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(500) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    for (let i = 0; i < data.ids.length; i++) {
+      const { error } = await supabaseAdmin
+        .from("delivery_zones")
+        .update({ display_order: i + 1 })
+        .eq("id", data.ids[i]);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });

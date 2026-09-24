@@ -110,3 +110,24 @@ export const adminSettingsQuery = queryOptions({
   },
 });
 
+
+export interface DeliveryZone {
+  id: string;
+  name: string;
+  fee: number;
+  display_order: number;
+  active: boolean;
+}
+
+export const deliveryZonesQuery = queryOptions({
+  queryKey: ["delivery-zones", "active"],
+  queryFn: async (): Promise<DeliveryZone[]> => {
+    const { data, error } = await supabase
+      .from("delivery_zones")
+      .select("id, name, fee, display_order, active")
+      .eq("active", true)
+      .order("display_order");
+    if (error) throw error;
+    return (data ?? []).map((z) => ({ ...z, fee: Number(z.fee) }));
+  },
+});
