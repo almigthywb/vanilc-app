@@ -8,6 +8,13 @@
       "when": 1790259839825,
       "tag": "0000_delivery_zones",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790259960069,
+      "tag": "0001_delivery_zones_policy_fix",
+      "breakpoints": true
     }
   ]
 }
