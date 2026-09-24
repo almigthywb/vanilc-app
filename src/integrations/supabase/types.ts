@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_zones: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_order: number
+          fee: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          fee: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          fee?: number
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -179,10 +209,13 @@ export type Database = {
           customer_phone: string
           delivery_fee: number
           delivery_type: Database["public"]["Enums"]["delivery_type"]
+          delivery_zone_id: string | null
+          delivery_zone_name: string | null
           id: string
           notes: string | null
           order_number: number
           payment_method: Database["public"]["Enums"]["payment_method"]
+          reference_point: string | null
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           total: number
@@ -198,10 +231,13 @@ export type Database = {
           customer_phone: string
           delivery_fee?: number
           delivery_type: Database["public"]["Enums"]["delivery_type"]
+          delivery_zone_id?: string | null
+          delivery_zone_name?: string | null
           id?: string
           notes?: string | null
           order_number?: number
           payment_method: Database["public"]["Enums"]["payment_method"]
+          reference_point?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal: number
           total: number
@@ -217,10 +253,13 @@ export type Database = {
           customer_phone?: string
           delivery_fee?: number
           delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          delivery_zone_id?: string | null
+          delivery_zone_name?: string | null
           id?: string
           notes?: string | null
           order_number?: number
           payment_method?: Database["public"]["Enums"]["payment_method"]
+          reference_point?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           total?: number
@@ -231,6 +270,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_delivery_zone_id_fkey"
+            columns: ["delivery_zone_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_zones"
             referencedColumns: ["id"]
           },
         ]
@@ -451,7 +497,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin"
-      delivery_type: "pickup" | "city" | "outside"
+      delivery_type: "pickup" | "city" | "outside" | "delivery"
       order_status:
         | "received"
         | "confirmed"
@@ -589,7 +635,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin"],
-      delivery_type: ["pickup", "city", "outside"],
+      delivery_type: ["pickup", "city", "outside", "delivery"],
       order_status: [
         "received",
         "confirmed",

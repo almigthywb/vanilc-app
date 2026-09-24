@@ -13,7 +13,9 @@ const CreateOrderSchema = z.object({
   firstName: z.string().trim().min(1).max(60),
   lastName: z.string().trim().max(60).optional().default(""),
   phone: z.string().trim().min(6).max(30),
-  deliveryType: z.enum(["pickup", "city", "outside"]),
+  deliveryType: z.enum(["pickup", "delivery"]),
+  deliveryZoneId: z.string().uuid().optional().nullable(),
+  referencePoint: z.string().trim().max(300).optional().default(""),
   address: z.string().trim().max(400).optional().default(""),
   paymentMethod: z.enum(["tpa", "qr_code", "unitel_money", "cash"]),
   notes: z.string().trim().max(500).optional().default(""),
@@ -26,7 +28,6 @@ export const createOrder = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const supabase = supabaseAdmin;
 
-    // Load settings to compute delivery fee + verify store open
     const { data: settings, error: sErr } = await supabase
       .from("settings")
       .select("*")
@@ -35,17 +36,24 @@ export const createOrder = createServerFn({ method: "POST" })
     if (sErr || !settings) throw new Error("Não foi possível carregar configurações.");
     if (!settings.store_open) throw new Error("A loja está fechada no momento.");
 
-    if (data.deliveryType !== "pickup" && !data.address.trim()) {
-      throw new Error("Endereço é obrigatório para entrega.");
+    // Fee is always recomputed server-side from the selected zone.
+    let deliveryFee = 0;
+    let zoneId: string | null = null;
+    let zoneName: string | null = null;
+    if (data.deliveryType === "delivery") {
+      if (!data.deliveryZoneId) throw new Error("Selecione a sua área de entrega.");
+      const { data: zone } = await supabase
+        .from("delivery_zones")
+        .select("id, name, fee, active")
+        .eq("id", data.deliveryZoneId)
+        .maybeSingle();
+      if (!zone || !zone.active) throw new Error("Zona de entrega indisponível.");
+      deliveryFee = Number(zone.fee);
+      zoneId = zone.id;
+      zoneName = zone.name;
     }
 
     const subtotal = data.items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
-    const deliveryFee =
-      data.deliveryType === "pickup"
-        ? 0
-        : data.deliveryType === "city"
-          ? Number(settings.delivery_fee_city)
-          : Number(settings.delivery_fee_outside);
     const total = subtotal + deliveryFee;
 
     // Upsert customer by NORMALIZED phone (single source of truth for identity)
@@ -90,6 +98,9 @@ export const createOrder = createServerFn({ method: "POST" })
         status: "received",
         delivery_type: data.deliveryType,
         address: data.address || null,
+        delivery_zone_id: zoneId,
+        delivery_zone_name: zoneName,
+        reference_point: data.referencePoint || null,
         payment_method: data.paymentMethod,
         subtotal,
         delivery_fee: deliveryFee,
@@ -119,5 +130,6 @@ export const createOrder = createServerFn({ method: "POST" })
       subtotal,
       deliveryFee,
       total,
+      zoneName,
     };
   });

@@ -18,6 +18,7 @@ import {
   Menu,
   ShieldCheck,
   XCircle,
+  MapPin,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -37,6 +38,7 @@ const NAV: Array<{ to: string; label: string; Icon: React.ComponentType<{ classN
   { to: "/admin/pedidos-cancelados", label: "Cancelados", Icon: XCircle },
   { to: "/admin/produtos", label: "Produtos", Icon: Beef },
   { to: "/admin/categorias", label: "Categorias", Icon: FolderTree },
+  { to: "/admin/zonas", label: "Zonas de Entrega", Icon: MapPin },
   { to: "/admin/clientes", label: "Clientes", Icon: Users },
   { to: "/admin/administradores", label: "Administradores", Icon: UserCog },
   { to: "/admin/relatorios", label: "Relatórios", Icon: BarChart3 },

@@ -83,26 +83,13 @@ function SettingsPage() {
         </Section>
 
         <Section title="Taxas de entrega" Icon={Truck}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Entrega na cidade (Kz)">
-              <input
-                type="number"
-                min={0}
-                className={inputClass}
-                value={s.delivery_fee_city}
-                onChange={(e) => setS({ ...s, delivery_fee_city: Number(e.target.value) })}
-              />
-            </Field>
-            <Field label="Entrega fora da cidade (Kz)">
-              <input
-                type="number"
-                min={0}
-                className={inputClass}
-                value={s.delivery_fee_outside}
-                onChange={(e) => setS({ ...s, delivery_fee_outside: Number(e.target.value) })}
-              />
-            </Field>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            As taxas agora são definidas por zona em{" "}
+            <a href="/admin/zonas" className="font-semibold text-primary underline">
+              Zonas de Entrega
+            </a>
+            .
+          </p>
         </Section>
 
         <Section title="Tempo médio de preparo" Icon={Clock}>
