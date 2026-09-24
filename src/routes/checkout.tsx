@@ -5,14 +5,14 @@ import { useState } from "react";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { CustomerShell } from "@/components/site/customer-shell";
 import { cart, useCart, cartSubtotal } from "@/lib/cart-store";
-import { settingsQuery } from "@/lib/queries";
+import { settingsQuery, deliveryZonesQuery } from "@/lib/queries";
 import { formatKwanza } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/lib/orders.functions";
 import { toast } from "sonner";
 import { PhoneInput, isValidPhone } from "@/components/site/phone-input";
 
-type DeliveryType = "pickup" | "city" | "outside";
+type DeliveryType = "pickup" | "delivery";
 type Payment = "tpa" | "qr_code" | "unitel_money" | "cash";
 
 const PAYMENT_LABEL: Record<Payment, string> = {
@@ -24,14 +24,17 @@ const PAYMENT_LABEL: Record<Payment, string> = {
 
 const DELIVERY_LABEL: Record<DeliveryType, string> = {
   pickup: "Retirar na churrasqueira",
-  city: "Entrega na cidade",
-  outside: "Entrega fora da cidade",
+  delivery: "Entrega",
 };
 
 
 
 export const Route = createFileRoute("/checkout")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(settingsQuery),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(settingsQuery),
+      context.queryClient.ensureQueryData(deliveryZonesQuery),
+    ]),
   head: () => ({ meta: [{ title: "Finalizar pedido — Vanilc" }] }),
   component: () => (
     <CustomerShell>
@@ -42,6 +45,7 @@ export const Route = createFileRoute("/checkout")({
 
 function CheckoutPage() {
   const { data: settings } = useSuspenseQuery(settingsQuery);
+  const { data: zones } = useSuspenseQuery(deliveryZonesQuery);
   const items = useCart();
   const subtotal = cartSubtotal(items);
   const navigate = useNavigate();
@@ -52,18 +56,15 @@ function CheckoutPage() {
   const [dialCode, setDialCode] = useState("+244");
   const [phone, setPhone] = useState("");
 
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>("city");
-  const [address, setAddress] = useState("");
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
+  const [zoneId, setZoneId] = useState("");
+  const [referencePoint, setReferencePoint] = useState("");
   const [payment, setPayment] = useState<Payment>("cash");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const deliveryFee =
-    deliveryType === "pickup"
-      ? 0
-      : deliveryType === "city"
-        ? Number(settings.delivery_fee_city)
-        : Number(settings.delivery_fee_outside);
+  const selectedZone = zones.find((z) => z.id === zoneId) ?? null;
+  const deliveryFee = deliveryType === "delivery" && selectedZone ? selectedZone.fee : 0;
   const total = subtotal + deliveryFee;
 
   if (!settings.store_open) {
@@ -92,6 +93,10 @@ function CheckoutPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
+    if (deliveryType === "delivery" && !selectedZone) {
+      toast.error("Selecione a sua área de entrega.");
+      return;
+    }
     setSubmitting(true);
     try {
       const fullPhone = `${dialCode} ${phone.trim()}`.trim();
@@ -101,7 +106,8 @@ function CheckoutPage() {
           lastName,
           phone: fullPhone,
           deliveryType,
-          address,
+          deliveryZoneId: deliveryType === "delivery" ? zoneId : null,
+          referencePoint: deliveryType === "delivery" ? referencePoint : "",
           paymentMethod: payment,
           notes,
           items: items.map((i) => ({
@@ -120,7 +126,8 @@ function CheckoutPage() {
         phone: fullPhone,
 
         deliveryType,
-        address,
+        zoneName: result.zoneName ?? "",
+        referencePoint,
         items,
         payment,
         notes,
@@ -193,50 +200,64 @@ function CheckoutPage() {
 
         <Card title="Tipo de entrega">
           <div className="space-y-2">
-            {(Object.keys(DELIVERY_LABEL) as DeliveryType[]).map((opt) => {
-              const fee =
-                opt === "pickup"
-                  ? "Grátis"
-                  : formatKwanza(
-                      opt === "city"
-                        ? settings.delivery_fee_city
-                        : settings.delivery_fee_outside,
-                    );
-              return (
-                <label
-                  key={opt}
-                  className={[
-                    "flex cursor-pointer items-center justify-between gap-3 rounded-xl border p-3 transition",
-                    deliveryType === opt
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:bg-muted",
-                  ].join(" ")}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="delivery"
-                      checked={deliveryType === opt}
-                      onChange={() => setDeliveryType(opt)}
-                      className="h-4 w-4 accent-primary"
-                    />
-                    <span className="font-medium">{DELIVERY_LABEL[opt]}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-primary">{fee}</span>
-                </label>
-              );
-            })}
+            {(Object.keys(DELIVERY_LABEL) as DeliveryType[]).map((opt) => (
+              <label
+                key={opt}
+                className={[
+                  "flex cursor-pointer items-center justify-between gap-3 rounded-xl border p-3 transition",
+                  deliveryType === opt ? "border-primary bg-primary/5" : "border-border hover:bg-muted",
+                ].join(" ")}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === opt}
+                    onChange={() => setDeliveryType(opt)}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  <span className="font-medium">{DELIVERY_LABEL[opt]}</span>
+                </div>
+                <span className="text-sm font-semibold text-primary">
+                  {opt === "pickup" ? "Grátis" : selectedZone ? formatKwanza(selectedZone.fee) : "Conforme a área"}
+                </span>
+              </label>
+            ))}
           </div>
-          {deliveryType !== "pickup" && (
-            <Field label="Endereço completo" required>
+          {deliveryType === "delivery" && (
+            <Field label="Selecione a sua área" required>
+              {zones.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  De momento não há zonas de entrega disponíveis.
+                </p>
+              ) : (
+                <select
+                  required
+                  value={zoneId}
+                  onChange={(e) => setZoneId(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="" disabled>
+                    Selecione a sua área
+                  </option>
+                  {zones.map((z) => (
+                    <option key={z.id} value={z.id}>
+                      {z.name} — {formatKwanza(z.fee)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </Field>
+          )}
+          {deliveryType === "delivery" && selectedZone && (
+            <Field label="Ponto de referência">
               <textarea
-                required
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                maxLength={400}
+                value={referencePoint}
+                onChange={(e) => setReferencePoint(e.target.value)}
+                maxLength={300}
                 rows={2}
                 className={inputClass}
-                placeholder="Bairro, rua, número, referências..."
+                placeholder="Ex: perto do mercado, portão azul, ..."
               />
             </Field>
           )}
@@ -371,7 +392,8 @@ interface BuildArgs {
   lastName: string;
   phone: string;
   deliveryType: DeliveryType;
-  address: string;
+  zoneName: string;
+  referencePoint: string;
   items: Array<{ name: string; qty: number; unitPrice: number; notes?: string }>;
   payment: Payment;
   notes: string;
@@ -387,7 +409,10 @@ function buildWhatsAppMessage(a: BuildArgs): string {
   lines.push(`*Nome:* ${a.firstName} ${a.lastName}`.trim());
   lines.push(`*Telefone:* ${a.phone}`);
   lines.push(`*Tipo de entrega:* ${DELIVERY_LABEL[a.deliveryType]}`);
-  if (a.deliveryType !== "pickup") lines.push(`*Endereço:* ${a.address}`);
+  if (a.deliveryType === "delivery") {
+    lines.push(`*Área:* ${a.zoneName}`);
+    if (a.referencePoint) lines.push(`*Ponto de referência:* ${a.referencePoint}`);
+  }
   lines.push("");
   lines.push("*Itens:*");
   for (const i of a.items) {
