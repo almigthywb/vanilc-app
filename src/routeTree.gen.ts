@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CardapioSlugRouteImport } from './routes/cardapio.$slug'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminZonasRouteImport } from './routes/_authenticated/admin.zonas'
 import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin.relatorios'
 import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin.produtos'
 import { Route as AuthenticatedAdminPedidosCanceladosRouteImport } from './routes/_authenticated/admin.pedidos-cancelados'
@@ -61,6 +62,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminZonasRoute = AuthenticatedAdminZonasRouteImport.update({
+  id: '/zonas',
+  path: '/zonas',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminRelatoriosRoute =
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/admin/pedidos-cancelados': typeof AuthenticatedAdminPedidosCanceladosRoute
   '/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
+  '/admin/zonas': typeof AuthenticatedAdminZonasRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/pedidos-cancelados': typeof AuthenticatedAdminPedidosCanceladosRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
+  '/admin/zonas': typeof AuthenticatedAdminZonasRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pedidos-cancelados': typeof AuthenticatedAdminPedidosCanceladosRoute
   '/_authenticated/admin/produtos': typeof AuthenticatedAdminProdutosRouteWithChildren
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
+  '/_authenticated/admin/zonas': typeof AuthenticatedAdminZonasRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/produtos/$categoryId': typeof AuthenticatedAdminProdutosCategoryIdRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos-cancelados'
     | '/admin/produtos'
     | '/admin/relatorios'
+    | '/admin/zonas'
     | '/admin/'
     | '/admin/clientes/$id'
     | '/admin/produtos/$categoryId'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos'
     | '/admin/pedidos-cancelados'
     | '/admin/relatorios'
+    | '/admin/zonas'
     | '/admin'
     | '/admin/clientes/$id'
     | '/admin/produtos/$categoryId'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pedidos-cancelados'
     | '/_authenticated/admin/produtos'
     | '/_authenticated/admin/relatorios'
+    | '/_authenticated/admin/zonas'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/clientes/$id'
     | '/_authenticated/admin/produtos/$categoryId'
@@ -313,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/zonas': {
+      id: '/_authenticated/admin/zonas'
+      path: '/zonas'
+      fullPath: '/admin/zonas'
+      preLoaderRoute: typeof AuthenticatedAdminZonasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/relatorios': {
@@ -444,6 +463,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPedidosCanceladosRoute: typeof AuthenticatedAdminPedidosCanceladosRoute
   AuthenticatedAdminProdutosRoute: typeof AuthenticatedAdminProdutosRouteWithChildren
   AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
+  AuthenticatedAdminZonasRoute: typeof AuthenticatedAdminZonasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -458,6 +478,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminPedidosCanceladosRoute,
   AuthenticatedAdminProdutosRoute: AuthenticatedAdminProdutosRouteWithChildren,
   AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
+  AuthenticatedAdminZonasRoute: AuthenticatedAdminZonasRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 

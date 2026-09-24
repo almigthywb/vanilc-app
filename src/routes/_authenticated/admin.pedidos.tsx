@@ -53,6 +53,8 @@ type OrderRow = {
   customer_phone: string;
   status: string;
   delivery_type: string;
+  delivery_zone_name?: string | null;
+  reference_point?: string | null;
   total: number | string;
   created_at: string;
   customers?: { customer_number: number; normalized_phone: string | null } | null;
@@ -175,9 +177,8 @@ function OrdersPage() {
                   <td className="px-4 py-3">
                     {o.delivery_type === "pickup"
                       ? "Retirada"
-                      : o.delivery_type === "city"
-                        ? "Cidade"
-                        : "Fora"}
+                      : o.delivery_zone_name ??
+                        (o.delivery_type === "city" ? "Cidade" : o.delivery_type === "outside" ? "Fora" : "Entrega")}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={o.status} />
@@ -382,11 +383,18 @@ function OrderModal({ id, onClose }: { id: string; onClose: () => void }) {
                 value={
                   o.delivery_type === "pickup"
                     ? "Retirar na churrasqueira"
-                    : o.delivery_type === "city"
-                      ? "Entrega na cidade"
-                      : "Entrega fora da cidade"
+                    : o.delivery_zone_name
+                      ? `Entrega — ${o.delivery_zone_name}`
+                      : o.delivery_type === "city"
+                        ? "Entrega na cidade"
+                        : o.delivery_type === "outside"
+                          ? "Entrega fora da cidade"
+                          : "Entrega"
                 }
               />
+              {o.reference_point && (
+                <Info label="Ponto de referência" value={o.reference_point} className="sm:col-span-2" />
+              )}
               <Info label="Pagamento" value={paymentLabel(o.payment_method)} />
               {o.address && <Info label="Endereço" value={o.address} className="sm:col-span-2" />}
               {o.notes && <Info label="Observações" value={o.notes} className="sm:col-span-2" />}

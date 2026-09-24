@@ -98,6 +98,9 @@ export const createOrder = createServerFn({ method: "POST" })
         status: "received",
         delivery_type: data.deliveryType,
         address: data.address || null,
+        delivery_zone_id: zoneId,
+        delivery_zone_name: zoneName,
+        reference_point: data.referencePoint || null,
         payment_method: data.paymentMethod,
         subtotal,
         delivery_fee: deliveryFee,
@@ -127,5 +130,6 @@ export const createOrder = createServerFn({ method: "POST" })
       subtotal,
       deliveryFee,
       total,
+      zoneName,
     };
   });
