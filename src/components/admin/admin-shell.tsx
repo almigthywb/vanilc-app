@@ -18,6 +18,7 @@ import {
   Menu,
   ShieldCheck,
   XCircle,
+  MapPin,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
