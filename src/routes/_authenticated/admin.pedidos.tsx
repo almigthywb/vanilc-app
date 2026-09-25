@@ -608,7 +608,7 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
 
 function paymentLabel(p: string) {
   return (
-    { tpa: "TPA", qr_code: "QR Code", unitel_money: "Unitel Money", cash: "Dinheiro" } as Record<
+    { tpa: "TPA", qr_code: "QR Code", unitel_money: "Unitel Money", cash: "Dinheiro", tpa_cash: "TPA / Cash", multicaixa_express: "Multicaixa Express" } as Record<
       string,
       string
     >

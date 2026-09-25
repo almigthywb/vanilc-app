@@ -17,7 +17,8 @@ const CreateOrderSchema = z.object({
   deliveryZoneId: z.string().uuid().optional().nullable(),
   referencePoint: z.string().trim().max(300).optional().default(""),
   address: z.string().trim().max(400).optional().default(""),
-  paymentMethod: z.enum(["tpa", "qr_code", "unitel_money", "cash"]),
+  // Only the currently available method may create a new order.
+  paymentMethod: z.literal("tpa_cash"),
   notes: z.string().trim().max(500).optional().default(""),
   items: z.array(CartItemSchema).min(1).max(50),
 });
@@ -84,7 +85,7 @@ export const createOrder = createServerFn({ method: "POST" })
         .select("id")
         .single();
       if (cErr) throw new Error(cErr.message);
-      customerId = inserted!.id;
+      customerId = inserted.id;
     }
 
     // Create order
@@ -113,7 +114,7 @@ export const createOrder = createServerFn({ method: "POST" })
 
     // Insert items
     const itemsPayload = data.items.map((i) => ({
-      order_id: order!.id,
+      order_id: order.id,
       product_id: i.productId ?? null,
       name_snapshot: i.name,
       qty: i.qty,
@@ -124,8 +125,8 @@ export const createOrder = createServerFn({ method: "POST" })
     if (iErr) throw new Error(iErr.message);
 
     return {
-      orderId: order!.id,
-      orderNumber: order!.order_number,
+      orderId: order.id,
+      orderNumber: order.order_number,
       whatsappNumber: settings.whatsapp_number,
       subtotal,
       deliveryFee,
