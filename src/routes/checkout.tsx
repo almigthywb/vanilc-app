@@ -330,6 +330,7 @@ function CheckoutPage() {
           <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
             <Row label="Subtotal" value={formatKwanza(subtotal)} />
             <Row label="Taxa de entrega" value={formatKwanza(deliveryFee)} />
+            <Row label="Pagamento" value={PAYMENT_LABEL[payment]} />
           </div>
           <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
             <span className="font-bold">Total</span>
