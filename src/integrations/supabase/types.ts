@@ -506,7 +506,13 @@ export type Database = {
         | "out_for_delivery"
         | "completed"
         | "cancelled"
-      payment_method: "tpa" | "qr_code" | "unitel_money" | "cash"
+      payment_method:
+        | "tpa"
+        | "qr_code"
+        | "unitel_money"
+        | "cash"
+        | "tpa_cash"
+        | "multicaixa_express"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -645,7 +651,14 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
-      payment_method: ["tpa", "qr_code", "unitel_money", "cash"],
+      payment_method: [
+        "tpa",
+        "qr_code",
+        "unitel_money",
+        "cash",
+        "tpa_cash",
+        "multicaixa_express",
+      ],
     },
   },
 } as const
