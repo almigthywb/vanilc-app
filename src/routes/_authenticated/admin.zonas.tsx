@@ -29,7 +29,14 @@ import { deleteDeliveryZone, reorderDeliveryZones, saveDeliveryZone } from "@/li
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/zonas")({
-  head: () => ({ meta: [{ title: "Zonas de Entrega — Admin Vanilc" }] }),
+  head: () => ({ meta: [
+    { title: "Zonas de entrega — Vanilc Admin" },
+    { name: "description", content: "Gerencie as áreas e as taxas de entrega da Vanilc." },
+    { property: "og:title", content: "Zonas de entrega — Vanilc Admin" },
+    { property: "og:description", content: "Gerencie as áreas e as taxas de entrega da Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ZonesPage,
 });
 

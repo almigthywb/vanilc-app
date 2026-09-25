@@ -11,15 +11,14 @@ import { Button } from "@/components/ui/button";
 import { createOrder } from "@/lib/orders.functions";
 import { toast } from "sonner";
 import { PhoneInput, isValidPhone } from "@/components/site/phone-input";
+import tpaCashImage from "@/assets/payment-tpa-cash.png.asset.json";
+import multicaixaImage from "@/assets/payment-multicaixa-express.png.asset.json";
 
 type DeliveryType = "pickup" | "delivery";
-type Payment = "tpa" | "qr_code" | "unitel_money" | "cash";
+type Payment = "tpa_cash";
 
 const PAYMENT_LABEL: Record<Payment, string> = {
-  tpa: "TPA",
-  qr_code: "QR Code",
-  unitel_money: "Unitel Money",
-  cash: "Dinheiro",
+  tpa_cash: "TPA / Cash",
 };
 
 const DELIVERY_LABEL: Record<DeliveryType, string> = {
@@ -35,7 +34,14 @@ export const Route = createFileRoute("/checkout")({
       context.queryClient.ensureQueryData(settingsQuery),
       context.queryClient.ensureQueryData(deliveryZonesQuery),
     ]),
-  head: () => ({ meta: [{ title: "Finalizar pedido — Vanilc" }] }),
+  head: () => ({ meta: [
+    { title: "Finalizar pedido — Vanilc" },
+    { name: "description", content: "Confirme o seu pedido Vanilc, escolha retirada ou entrega e pague com TPA ou dinheiro." },
+    { property: "og:title", content: "Finalizar pedido — Vanilc" },
+    { property: "og:description", content: "Confirme o seu pedido Vanilc, escolha retirada ou entrega e pague com TPA ou dinheiro." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: () => (
     <CustomerShell>
       <CheckoutPage />
@@ -59,7 +65,7 @@ function CheckoutPage() {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
   const [zoneId, setZoneId] = useState("");
   const [referencePoint, setReferencePoint] = useState("");
-  const [payment, setPayment] = useState<Payment>("cash");
+  const [payment, setPayment] = useState<Payment>("tpa_cash");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -264,27 +270,31 @@ function CheckoutPage() {
         </Card>
 
         <Card title="Forma de pagamento">
-          <div className="grid gap-2 sm:grid-cols-2">
-            {(Object.keys(PAYMENT_LABEL) as Payment[]).map((opt) => (
-              <label
-                key={opt}
-                className={[
-                  "flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition",
-                  payment === opt
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:bg-muted",
-                ].join(" ")}
-              >
-                <input
-                  type="radio"
-                  name="payment"
-                  checked={payment === opt}
-                  onChange={() => setPayment(opt)}
-                  className="h-4 w-4 accent-primary"
-                />
-                <span className="font-medium">{PAYMENT_LABEL[opt]}</span>
-              </label>
-            ))}
+          <div className="mx-auto grid max-w-[410px] grid-cols-2 gap-3 sm:gap-4" role="group" aria-label="Forma de pagamento">
+            <Button
+              type="button"
+              variant="outline"
+              aria-pressed={payment === "tpa_cash"}
+              onClick={() => setPayment("tpa_cash")}
+              className={`aspect-square h-auto min-w-0 w-full flex-col gap-0 overflow-hidden rounded-lg border-2 bg-cream p-2 shadow-card hover:bg-cream focus-visible:ring-2 focus-visible:ring-ring ${payment === "tpa_cash" ? "border-primary" : "border-border"}`}
+            >
+              <span className="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
+                <img src={tpaCashImage.url} alt="Terminal TPA e pagamento em dinheiro" className="max-h-full w-full object-contain" />
+              </span>
+              <span className="w-full shrink-0 whitespace-normal py-2 text-center text-sm font-semibold leading-tight text-foreground">TPA / Cash</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              aria-pressed={false}
+              onClick={() => toast("Indisponível")}
+              className="aspect-square h-auto min-w-0 w-full flex-col gap-0 overflow-hidden rounded-lg border-2 border-border bg-cream p-2 shadow-card hover:bg-cream focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span className="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
+                <img src={multicaixaImage.url} alt="Logotipo Multicaixa Express" className="max-h-full w-full object-contain" />
+              </span>
+              <span className="w-full shrink-0 whitespace-normal py-2 text-center text-sm font-semibold leading-tight text-foreground">Multicaixa Express</span>
+            </Button>
           </div>
         </Card>
 
@@ -320,6 +330,7 @@ function CheckoutPage() {
           <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
             <Row label="Subtotal" value={formatKwanza(subtotal)} />
             <Row label="Taxa de entrega" value={formatKwanza(deliveryFee)} />
+            <Row label="Pagamento" value={PAYMENT_LABEL[payment]} />
           </div>
           <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
             <span className="font-bold">Total</span>

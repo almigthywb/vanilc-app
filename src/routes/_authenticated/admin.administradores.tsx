@@ -21,6 +21,14 @@ import {
 import { listAdmins, createAdmin, removeAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/administradores")({
+  head: () => ({ meta: [
+    { title: "Administradores — Vanilc Admin" },
+    { name: "description", content: "Gerencie o acesso dos administradores da Vanilc." },
+    { property: "og:title", content: "Administradores — Vanilc Admin" },
+    { property: "og:description", content: "Gerencie o acesso dos administradores da Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AdminsPage,
 });
 

@@ -8,6 +8,14 @@ import { formatCustomerNumber, formatPhonePretty } from "@/lib/phone";
 import { TableSkeleton } from "@/components/motion/skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/")({
+  head: () => ({ meta: [
+    { title: "Clientes — Vanilc Admin" },
+    { name: "description", content: "Consulte os clientes e os seus pedidos na Vanilc." },
+    { property: "og:title", content: "Clientes — Vanilc Admin" },
+    { property: "og:description", content: "Consulte os clientes e os seus pedidos na Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: CustomersPage,
 });
 

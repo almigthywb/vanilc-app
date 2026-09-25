@@ -8,7 +8,14 @@ import logo from "@/assets/vanilc-logo.png";
 import { SiteFooter } from "@/components/site/site-footer";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Entrar — Vanilc Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Entrar — Vanilc Admin" },
+    { name: "description", content: "Acesso à área administrativa da Churrasqueira Vanilc." },
+    { property: "og:title", content: "Entrar — Vanilc Admin" },
+    { property: "og:description", content: "Acesso à área administrativa da Churrasqueira Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AuthPage,
 });
 

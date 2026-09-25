@@ -10,6 +10,14 @@ import { StatusBadge } from "./admin.index";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos")({
+  head: () => ({ meta: [
+    { title: "Pedidos — Vanilc Admin" },
+    { name: "description", content: "Acompanhe os pedidos e respetivas formas de pagamento." },
+    { property: "og:title", content: "Pedidos — Vanilc Admin" },
+    { property: "og:description", content: "Acompanhe os pedidos e respetivas formas de pagamento." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: OrdersPage,
 });
 
@@ -608,7 +616,7 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
 
 function paymentLabel(p: string) {
   return (
-    { tpa: "TPA", qr_code: "QR Code", unitel_money: "Unitel Money", cash: "Dinheiro" } as Record<
+    { tpa: "TPA", qr_code: "QR Code", unitel_money: "Unitel Money", cash: "Dinheiro", tpa_cash: "TPA / Cash", multicaixa_express: "Multicaixa Express" } as Record<
       string,
       string
     >

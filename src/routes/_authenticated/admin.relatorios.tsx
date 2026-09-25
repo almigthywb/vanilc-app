@@ -5,6 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin/relatorios")({
+  head: () => ({ meta: [
+    { title: "Relatórios — Vanilc Admin" },
+    { name: "description", content: "Analise os pedidos finalizados e as vendas da Vanilc." },
+    { property: "og:title", content: "Relatórios — Vanilc Admin" },
+    { property: "og:description", content: "Analise os pedidos finalizados e as vendas da Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ReportsPage,
 });
 
