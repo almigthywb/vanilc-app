@@ -5,6 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { resolveProductImage } from "@/lib/product-images";
 
 export const Route = createFileRoute("/_authenticated/admin/produtos/")({
+  head: () => ({ meta: [
+    { title: "Produtos — Vanilc Admin" },
+    { name: "description", content: "Escolha uma categoria para gerenciar os produtos Vanilc." },
+    { property: "og:title", content: "Produtos — Vanilc Admin" },
+    { property: "og:description", content: "Escolha uma categoria para gerenciar os produtos Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ProductsCategoriesPage,
 });
 

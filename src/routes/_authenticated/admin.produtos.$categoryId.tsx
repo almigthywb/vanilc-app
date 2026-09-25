@@ -46,6 +46,14 @@ const FILTERS: Array<{ id: Filter; label: string }> = [
 ];
 
 export const Route = createFileRoute("/_authenticated/admin/produtos/$categoryId")({
+  head: () => ({ meta: [
+    { title: "Produtos da categoria — Vanilc Admin" },
+    { name: "description", content: "Gerencie os produtos desta categoria no cardápio Vanilc." },
+    { property: "og:title", content: "Produtos da categoria — Vanilc Admin" },
+    { property: "og:description", content: "Gerencie os produtos desta categoria no cardápio Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: CategoryProductsPage,
 });
 

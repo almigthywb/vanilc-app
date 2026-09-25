@@ -14,16 +14,14 @@ export const Route = createFileRoute("/")({
     context.queryClient.ensureQueryData(productsQuery);
     context.queryClient.ensureQueryData(settingsQuery);
   },
-  head: () => ({
-    meta: [
-      { title: "Vanilc Churrascaria — O melhor churrasco entregue na sua casa" },
-      {
-        name: "description",
-        content:
-          "Peça picanha, costela, combos e bebidas com entrega rápida em Luanda. Qualidade premium e atendimento dedicado.",
-      },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Vanilc Churrascaria — Churrasco em Luanda" },
+    { name: "description", content: "Peça picanha, costela, combos e bebidas com entrega em Luanda." },
+    { property: "og:title", content: "Vanilc Churrascaria — Churrasco em Luanda" },
+    { property: "og:description", content: "Peça picanha, costela, combos e bebidas com entrega em Luanda." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: HomePage,
 });
 

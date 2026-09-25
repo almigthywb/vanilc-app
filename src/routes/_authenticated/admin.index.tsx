@@ -16,6 +16,14 @@ import { AnimatedCounter } from "@/components/motion/animated-counter";
 import { StatGridSkeleton, TableSkeleton } from "@/components/motion/skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  head: () => ({ meta: [
+    { title: "Painel — Vanilc Admin" },
+    { name: "description", content: "Acompanhe os pedidos e as vendas da Vanilc." },
+    { property: "og:title", content: "Painel — Vanilc Admin" },
+    { property: "og:description", content: "Acompanhe os pedidos e as vendas da Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: DashboardPage,
 });
 

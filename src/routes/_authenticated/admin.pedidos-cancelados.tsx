@@ -6,6 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos-cancelados")({
+  head: () => ({ meta: [
+    { title: "Pedidos cancelados — Vanilc Admin" },
+    { name: "description", content: "Consulte os pedidos cancelados na Vanilc." },
+    { property: "og:title", content: "Pedidos cancelados — Vanilc Admin" },
+    { property: "og:description", content: "Consulte os pedidos cancelados na Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: CancelledOrdersPage,
 });
 

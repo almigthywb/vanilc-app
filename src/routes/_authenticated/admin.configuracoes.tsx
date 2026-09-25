@@ -10,6 +10,14 @@ import { adminSettingsQuery, type Settings } from "@/lib/queries";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
+  head: () => ({ meta: [
+    { title: "Configurações — Vanilc Admin" },
+    { name: "description", content: "Configure a operação e os banners da Vanilc." },
+    { property: "og:title", content: "Configurações — Vanilc Admin" },
+    { property: "og:description", content: "Configure a operação e os banners da Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SettingsPage,
 });
 

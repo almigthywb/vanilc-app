@@ -9,6 +9,14 @@ import { deleteAdminCategory, saveAdminCategory } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/categorias")({
+  head: () => ({ meta: [
+    { title: "Categorias — Vanilc Admin" },
+    { name: "description", content: "Organize as categorias do cardápio Vanilc." },
+    { property: "og:title", content: "Categorias — Vanilc Admin" },
+    { property: "og:description", content: "Organize as categorias do cardápio Vanilc." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: CategoriesPage,
 });
 

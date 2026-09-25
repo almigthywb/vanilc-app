@@ -10,6 +10,14 @@ import { StatusBadge } from "./admin.index";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/$id")({
+  head: () => ({ meta: [
+    { title: "Detalhes do cliente — Vanilc Admin" },
+    { name: "description", content: "Consulte os dados e o histórico de pedidos do cliente." },
+    { property: "og:title", content: "Detalhes do cliente — Vanilc Admin" },
+    { property: "og:description", content: "Consulte os dados e o histórico de pedidos do cliente." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: CustomerDetailPage,
 });
 
