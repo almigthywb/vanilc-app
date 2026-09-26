@@ -330,7 +330,7 @@ function CheckoutPage() {
           <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
             <Row label="Subtotal" value={formatKwanza(subtotal)} />
             <Row label="Taxa de entrega" value={formatKwanza(deliveryFee)} />
-            <Row label="Pagamento" value={PAYMENT_LABEL[payment]} />
+            <Row label="Pagamento" value={payment ? PAYMENT_LABEL[payment] : "—"} />
           </div>
           <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
             <span className="font-bold">Total</span>
@@ -338,7 +338,7 @@ function CheckoutPage() {
           </div>
           <Button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || payment !== "tpa_cash"}
             className="mt-5 h-12 w-full text-base font-bold"
           >
             <MessageCircle className="mr-2 h-5 w-5" />
