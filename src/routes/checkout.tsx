@@ -406,7 +406,7 @@ interface BuildArgs {
   zoneName: string;
   referencePoint: string;
   items: Array<{ name: string; qty: number; unitPrice: number; notes?: string }>;
-  payment: Payment;
+  payment: "tpa_cash";
   notes: string;
   subtotal: number;
   deliveryFee: number;
