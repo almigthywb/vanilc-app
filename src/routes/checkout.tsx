@@ -15,9 +15,9 @@ import tpaCashImage from "@/assets/payment-tpa-cash.png.asset.json";
 import multicaixaImage from "@/assets/payment-multicaixa-express.png.asset.json";
 
 type DeliveryType = "pickup" | "delivery";
-type Payment = "tpa_cash";
+type Payment = "tpa_cash" | null;
 
-const PAYMENT_LABEL: Record<Payment, string> = {
+const PAYMENT_LABEL: Record<"tpa_cash", string> = {
   tpa_cash: "TPA / Cash",
 };
 
@@ -65,7 +65,7 @@ function CheckoutPage() {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
   const [zoneId, setZoneId] = useState("");
   const [referencePoint, setReferencePoint] = useState("");
-  const [payment, setPayment] = useState<Payment>("tpa_cash");
+  const [payment, setPayment] = useState<Payment>(null);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -135,7 +135,7 @@ function CheckoutPage() {
         zoneName: result.zoneName ?? "",
         referencePoint,
         items,
-        payment,
+        payment: payment ?? "tpa_cash",
         notes,
         subtotal: result.subtotal,
         deliveryFee: result.deliveryFee,
@@ -330,7 +330,7 @@ function CheckoutPage() {
           <div className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
             <Row label="Subtotal" value={formatKwanza(subtotal)} />
             <Row label="Taxa de entrega" value={formatKwanza(deliveryFee)} />
-            <Row label="Pagamento" value={PAYMENT_LABEL[payment]} />
+            <Row label="Pagamento" value={payment ? PAYMENT_LABEL[payment] : "—"} />
           </div>
           <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
             <span className="font-bold">Total</span>
@@ -338,7 +338,7 @@ function CheckoutPage() {
           </div>
           <Button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || payment !== "tpa_cash"}
             className="mt-5 h-12 w-full text-base font-bold"
           >
             <MessageCircle className="mr-2 h-5 w-5" />
@@ -406,7 +406,7 @@ interface BuildArgs {
   zoneName: string;
   referencePoint: string;
   items: Array<{ name: string; qty: number; unitPrice: number; notes?: string }>;
-  payment: Payment;
+  payment: "tpa_cash";
   notes: string;
   subtotal: number;
   deliveryFee: number;
