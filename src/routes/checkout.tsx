@@ -135,7 +135,7 @@ function CheckoutPage() {
         zoneName: result.zoneName ?? "",
         referencePoint,
         items,
-        payment,
+        payment: payment ?? "tpa_cash",
         notes,
         subtotal: result.subtotal,
         deliveryFee: result.deliveryFee,
