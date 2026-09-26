@@ -4,6 +4,7 @@ import { useState } from "react";
 import { XCircle, Eye, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatKwanza, formatDateTime } from "@/lib/format";
+import { paymentLabel } from "@/lib/payment-label";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos-cancelados")({
   head: () => ({ meta: [
@@ -149,6 +150,10 @@ function CancelledDetail({ id, onClose }: { id: string; onClose: () => void }) {
               <div>
                 <p className="text-xs uppercase text-muted-foreground">Criado em</p>
                 <p className="font-medium">{formatDateTime(o.created_at)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">Pagamento</p>
+                <p className="font-medium">{paymentLabel(o.payment_method)}</p>
               </div>
               {o.address && (
                 <div className="sm:col-span-2">

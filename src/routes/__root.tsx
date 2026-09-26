@@ -87,10 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "O melhor sabor do churrasco, na palma da sua mão." },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "Churrasqueira Vanilc - A um clique de distáncia" },
-      { name: "description", content: "O melhor sabor do churrasco, na palma da sua mão." },
       { name: "twitter:description", content: "O melhor sabor do churrasco, na palma da sua mão." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/qPkSRWure9VVsrxyvItSo6aKZy23/social-images/social-1782177389957-b49ea406-8b3e-4cf7-84d3-064bacfaeee0.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/qPkSRWure9VVsrxyvItSo6aKZy23/social-images/social-1782177389957-b49ea406-8b3e-4cf7-84d3-064bacfaeee0.webp" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
