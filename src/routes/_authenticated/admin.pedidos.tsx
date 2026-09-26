@@ -8,6 +8,7 @@ import { formatCustomerNumber, formatPhonePretty, normalizePhone } from "@/lib/p
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./admin.index";
 import { toast } from "sonner";
+import { paymentLabel } from "@/lib/payment-label";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos")({
   head: () => ({ meta: [
@@ -614,11 +615,3 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
   );
 }
 
-function paymentLabel(p: string) {
-  return (
-    { tpa: "TPA", qr_code: "QR Code", unitel_money: "Unitel Money", cash: "Dinheiro", tpa_cash: "TPA / Cash", multicaixa_express: "Multicaixa Express" } as Record<
-      string,
-      string
-    >
-  )[p] ?? p;
-}
