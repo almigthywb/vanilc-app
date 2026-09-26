@@ -15,9 +15,9 @@ import tpaCashImage from "@/assets/payment-tpa-cash.png.asset.json";
 import multicaixaImage from "@/assets/payment-multicaixa-express.png.asset.json";
 
 type DeliveryType = "pickup" | "delivery";
-type Payment = "tpa_cash";
+type Payment = "tpa_cash" | null;
 
-const PAYMENT_LABEL: Record<Payment, string> = {
+const PAYMENT_LABEL: Record<"tpa_cash", string> = {
   tpa_cash: "TPA / Cash",
 };
 
@@ -65,7 +65,7 @@ function CheckoutPage() {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
   const [zoneId, setZoneId] = useState("");
   const [referencePoint, setReferencePoint] = useState("");
-  const [payment, setPayment] = useState<Payment>("tpa_cash");
+  const [payment, setPayment] = useState<Payment>(null);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
