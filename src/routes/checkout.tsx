@@ -270,30 +270,30 @@ function CheckoutPage() {
         </Card>
 
         <Card title="Forma de pagamento">
-          <div className="mx-auto grid max-w-[410px] grid-cols-2 gap-3 sm:gap-4" role="group" aria-label="Forma de pagamento">
+          <div className="mx-auto grid max-w-[360px] grid-cols-2 gap-5 sm:gap-7" role="group" aria-label="Forma de pagamento">
             <Button
               type="button"
               variant="outline"
               aria-pressed={payment === "tpa_cash"}
               onClick={() => setPayment("tpa_cash")}
-              className={`aspect-square h-auto min-w-0 w-full flex-col gap-0 overflow-hidden rounded-lg border-2 bg-cream p-2 shadow-card hover:bg-cream focus-visible:ring-2 focus-visible:ring-ring ${payment === "tpa_cash" ? "border-primary" : "border-border"}`}
+              className={`flex h-auto min-w-0 w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 bg-cream p-3 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-cream hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring ${payment === "tpa_cash" ? "border-primary" : "border-border"}`}
             >
-              <span className="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
-                <img src={tpaCashImage.url} alt="Terminal TPA e pagamento em dinheiro" className="max-h-full w-full object-contain" />
+              <span className="flex h-20 w-20 shrink-0 items-center justify-center">
+                <img src={tpaCashImage.url} alt="Terminal TPA e pagamento em dinheiro" className="h-full w-full object-contain" />
               </span>
-              <span className="w-full shrink-0 whitespace-normal py-2 text-center text-sm font-semibold leading-tight text-foreground">TPA / Cash</span>
+              <span className="w-full text-center text-xs font-semibold leading-tight text-foreground">TPA / Cash</span>
             </Button>
             <Button
               type="button"
               variant="outline"
               aria-pressed={false}
               onClick={() => toast("Indisponível")}
-              className="aspect-square h-auto min-w-0 w-full flex-col gap-0 overflow-hidden rounded-lg border-2 border-border bg-cream p-2 shadow-card hover:bg-cream focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-auto min-w-0 w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-cream p-3 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-cream hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <span className="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
-                <img src={multicaixaImage.url} alt="Logotipo Multicaixa Express" className="max-h-full w-full object-contain" />
+              <span className="flex h-20 w-20 shrink-0 items-center justify-center">
+                <img src={multicaixaImage.url} alt="Logotipo Multicaixa Express" className="h-full w-full object-contain" />
               </span>
-              <span className="w-full shrink-0 whitespace-normal py-2 text-center text-sm font-semibold leading-tight text-foreground">Multicaixa Express</span>
+              <span className="w-full text-center text-xs font-semibold leading-tight text-foreground">Multicaixa Express</span>
             </Button>
           </div>
         </Card>
