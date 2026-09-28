@@ -103,6 +103,10 @@ function CheckoutPage() {
       toast.error("Selecione a sua área de entrega.");
       return;
     }
+    if (!payment) {
+      toast.error("Selecione a forma de pagamento.");
+      return;
+    }
     setSubmitting(true);
     try {
       const fullPhone = `${dialCode} ${phone.trim()}`.trim();
@@ -135,7 +139,7 @@ function CheckoutPage() {
         zoneName: result.zoneName ?? "",
         referencePoint,
         items,
-        payment: payment ?? "tpa_cash",
+        payment,
         notes,
         subtotal: result.subtotal,
         deliveryFee: result.deliveryFee,
@@ -336,10 +340,15 @@ function CheckoutPage() {
             <span className="font-bold">Total</span>
             <span className="text-2xl font-extrabold text-primary">{formatKwanza(total)}</span>
           </div>
+          {payment !== "tpa_cash" && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Escolha a forma de pagamento para continuar.
+            </p>
+          )}
           <Button
             type="submit"
             disabled={submitting || payment !== "tpa_cash"}
-            className="mt-5 h-12 w-full text-base font-bold"
+            className="mt-1 h-12 w-full text-base font-bold"
           >
             <MessageCircle className="mr-2 h-5 w-5" />
             {submitting ? "Enviando..." : "Confirmar pedido"}
