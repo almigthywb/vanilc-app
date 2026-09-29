@@ -1,11 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+// Only productId, qty and notes are trusted from the client; name/price come from the DB.
 const CartItemSchema = z.object({
-  productId: z.string().uuid().nullable().optional(),
-  name: z.string().min(1).max(200),
+  productId: z.string().uuid(),
   qty: z.number().int().min(1).max(50),
-  unitPrice: z.number().nonnegative().max(10_000_000),
   notes: z.string().max(500).optional().nullable(),
 });
 
@@ -54,7 +53,29 @@ export const createOrder = createServerFn({ method: "POST" })
       zoneName = zone.name;
     }
 
-    const subtotal = data.items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
+    // Recompute item prices/names from the database — never trust the client.
+    const productIds = [...new Set(data.items.map((i) => i.productId))];
+    const { data: products, error: pErr } = await supabase
+      .from("products")
+      .select("id, name, price, promo_price, is_promo, available")
+      .in("id", productIds);
+    if (pErr) throw new Error("Não foi possível validar os produtos do pedido.");
+    const productMap = new Map((products ?? []).map((p) => [p.id, p]));
+
+    const pricedItems = data.items.map((i) => {
+      const p = productMap.get(i.productId);
+      if (!p || !p.available) {
+        const label = p?.name ? `O produto '${p.name}'` : "Um dos produtos";
+        throw new Error(
+          `${label} já não está disponível. Atualize o carrinho e tente novamente.`,
+        );
+      }
+      const unitPrice =
+        p.is_promo === true && p.promo_price != null ? Number(p.promo_price) : Number(p.price);
+      return { productId: p.id, name: p.name, qty: i.qty, unitPrice, notes: i.notes ?? null };
+    });
+
+    const subtotal = pricedItems.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
     const total = subtotal + deliveryFee;
 
     // Upsert customer by NORMALIZED phone (single source of truth for identity)
@@ -113,13 +134,13 @@ export const createOrder = createServerFn({ method: "POST" })
     if (oErr) throw new Error(oErr.message);
 
     // Insert items
-    const itemsPayload = data.items.map((i) => ({
+    const itemsPayload = pricedItems.map((i) => ({
       order_id: order.id,
-      product_id: i.productId ?? null,
+      product_id: i.productId,
       name_snapshot: i.name,
       qty: i.qty,
       unit_price: i.unitPrice,
-      notes: i.notes ?? null,
+      notes: i.notes,
     }));
     const { error: iErr } = await supabase.from("order_items").insert(itemsPayload);
     if (iErr) throw new Error(iErr.message);
