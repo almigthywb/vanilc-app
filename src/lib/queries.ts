@@ -80,7 +80,7 @@ export const settingsQuery = queryOptions({
   queryKey: ["settings"],
   queryFn: async (): Promise<Settings> => {
     const { data, error } = await supabase
-      .from("settings_public" as "settings")
+      .from("settings_public")
       .select(SETTINGS_PUBLIC_COLUMNS)
       .eq("id", 1)
       .single();

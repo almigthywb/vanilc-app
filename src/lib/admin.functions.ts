@@ -41,6 +41,21 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
     return { granted: true };
   });
 
+
+type AdminClient = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
+// Reads every page of auth users (listUsers returns one page at a time).
+async function listAllUsers(admin: AdminClient) {
+  const users: Awaited<ReturnType<AdminClient["auth"]["admin"]["listUsers"]>>["data"]["users"] = [];
+  const perPage = 1000;
+  for (let page = 1; page < 1000; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) return { users, error };
+    users.push(...data.users);
+    if (data.users.length < perPage) break;
+  }
+  return { users, error: null };
+}
+
 const GrantAdmin = z.object({ email: z.string().email() });
 
 const requireAdmin = async (supabase: SupabaseClient<Database>, userId: string) => {
@@ -86,7 +101,8 @@ export const grantAdminByEmail = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Look up user by email via admin API
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
     if (lErr) throw fail("grantAdminByEmail", lErr, "Não foi possível conceder acesso de administrador.");
     const target = list.users.find(
       (u) => (u.email ?? "").toLowerCase() === data.email.toLowerCase(),
@@ -210,7 +226,8 @@ export const listAdmins = createServerFn({ method: "GET" })
       .select("id, user_id, created_at, created_by")
       .eq("role", "admin");
     if (error) throw fail("listAdmins", error, "Não foi possível carregar os administradores.");
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
     if (lErr) throw fail("listAdmins", lErr, "Não foi possível carregar os administradores.");
     const byId = new Map(list.users.map((u) => [u.id, u]));
     const admins = (roles ?? []).map((r) => {
@@ -236,7 +253,8 @@ export const createAdmin = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
     if (lErr) throw fail("createAdmin", lErr, "Não foi possível criar o administrador.");
     const existing = list.users.find(
       (u) => (u.email ?? "").toLowerCase() === data.email.toLowerCase(),
@@ -297,7 +315,8 @@ export const removeAdmin = createServerFn({ method: "POST" })
     }
 
     let targetEmail: string | null = null;
-    const { data: list } = await supabaseAdmin.auth.admin.listUsers();
+    const { users: allUsers } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
     targetEmail = list?.users.find((u) => u.id === data.userId)?.email ?? null;
 
     const { error } = await supabaseAdmin
