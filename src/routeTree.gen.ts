@@ -9,30 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CardapioSlugRouteImport } from './routes/cardapio.$slug'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as CardapioSlugRouteImport } from './routes/cardapio.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminZonasRouteImport } from './routes/_authenticated/admin.zonas'
-import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin.relatorios'
-import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin.produtos'
-import { Route as AuthenticatedAdminPedidosCanceladosRouteImport } from './routes/_authenticated/admin.pedidos-cancelados'
-import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
-import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
-import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
-import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminAdministradoresRouteImport } from './routes/_authenticated/admin.administradores'
-import { Route as AuthenticatedAdminProdutosIndexRouteImport } from './routes/_authenticated/admin.produtos.index'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
+import { Route as AuthenticatedAdminPedidosCanceladosRouteImport } from './routes/_authenticated/admin.pedidos-cancelados'
+import { Route as AuthenticatedAdminProdutosRouteImport } from './routes/_authenticated/admin.produtos'
+import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin.relatorios'
+import { Route as AuthenticatedAdminZonasRouteImport } from './routes/_authenticated/admin.zonas'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin.clientes.index'
-import { Route as AuthenticatedAdminProdutosCategoryIdRouteImport } from './routes/_authenticated/admin.produtos.$categoryId'
 import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_authenticated/admin.clientes.$id'
+import { Route as AuthenticatedAdminProdutosIndexRouteImport } from './routes/_authenticated/admin.produtos.index'
+import { Route as AuthenticatedAdminProdutosCategoryIdRouteImport } from './routes/_authenticated/admin.produtos.$categoryId'
 
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -40,18 +44,9 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CardapioSlugRoute = CardapioSlugRouteImport.update({
-  id: '/cardapio/$slug',
-  path: '/cardapio/$slug',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -59,50 +54,20 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CardapioSlugRoute = CardapioSlugRouteImport.update({
+  id: '/cardapio/$slug',
+  path: '/cardapio/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedAdminZonasRoute = AuthenticatedAdminZonasRouteImport.update({
-  id: '/zonas',
-  path: '/zonas',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminRelatoriosRoute =
-  AuthenticatedAdminRelatoriosRouteImport.update({
-    id: '/relatorios',
-    path: '/relatorios',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminProdutosRoute =
-  AuthenticatedAdminProdutosRouteImport.update({
-    id: '/produtos',
-    path: '/produtos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminPedidosCanceladosRoute =
-  AuthenticatedAdminPedidosCanceladosRouteImport.update({
-    id: '/pedidos-cancelados',
-    path: '/pedidos-cancelados',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminPedidosRoute =
-  AuthenticatedAdminPedidosRouteImport.update({
-    id: '/pedidos',
-    path: '/pedidos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminConfiguracoesRoute =
-  AuthenticatedAdminConfiguracoesRouteImport.update({
-    id: '/configuracoes',
-    path: '/configuracoes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminClientesRoute =
-  AuthenticatedAdminClientesRouteImport.update({
-    id: '/clientes',
-    path: '/clientes',
+const AuthenticatedAdminAdministradoresRoute =
+  AuthenticatedAdminAdministradoresRouteImport.update({
+    id: '/administradores',
+    path: '/administradores',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCategoriasRoute =
@@ -111,11 +76,58 @@ const AuthenticatedAdminCategoriasRoute =
     path: '/categorias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminAdministradoresRoute =
-  AuthenticatedAdminAdministradoresRouteImport.update({
-    id: '/administradores',
-    path: '/administradores',
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPedidosRoute =
+  AuthenticatedAdminPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPedidosCanceladosRoute =
+  AuthenticatedAdminPedidosCanceladosRouteImport.update({
+    id: '/pedidos-cancelados',
+    path: '/pedidos-cancelados',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProdutosRoute =
+  AuthenticatedAdminProdutosRouteImport.update({
+    id: '/produtos',
+    path: '/produtos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminRelatoriosRoute =
+  AuthenticatedAdminRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminZonasRoute = AuthenticatedAdminZonasRouteImport.update({
+  id: '/zonas',
+  path: '/zonas',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminClientesIndexRoute =
+  AuthenticatedAdminClientesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
+  } as any)
+const AuthenticatedAdminClientesIdRoute =
+  AuthenticatedAdminClientesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminClientesRoute,
   } as any)
 const AuthenticatedAdminProdutosIndexRoute =
   AuthenticatedAdminProdutosIndexRouteImport.update({
@@ -123,23 +135,11 @@ const AuthenticatedAdminProdutosIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminProdutosRoute,
   } as any)
-const AuthenticatedAdminClientesIndexRoute =
-  AuthenticatedAdminClientesIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedAdminClientesRoute,
-  } as any)
 const AuthenticatedAdminProdutosCategoryIdRoute =
   AuthenticatedAdminProdutosCategoryIdRouteImport.update({
     id: '/$categoryId',
     path: '/$categoryId',
     getParentRoute: () => AuthenticatedAdminProdutosRoute,
-  } as any)
-const AuthenticatedAdminClientesIdRoute =
-  AuthenticatedAdminClientesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedAdminClientesRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -278,18 +278,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -299,18 +292,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cardapio/$slug': {
-      id: '/cardapio/$slug'
-      path: '/cardapio/$slug'
-      fullPath: '/cardapio/$slug'
-      preLoaderRoute: typeof CardapioSlugRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -320,67 +313,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/cardapio/$slug': {
+      id: '/cardapio/$slug'
+      path: '/cardapio/$slug'
+      fullPath: '/cardapio/$slug'
+      preLoaderRoute: typeof CardapioSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/zonas': {
-      id: '/_authenticated/admin/zonas'
-      path: '/zonas'
-      fullPath: '/admin/zonas'
-      preLoaderRoute: typeof AuthenticatedAdminZonasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/relatorios': {
-      id: '/_authenticated/admin/relatorios'
-      path: '/relatorios'
-      fullPath: '/admin/relatorios'
-      preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/produtos': {
-      id: '/_authenticated/admin/produtos'
-      path: '/produtos'
-      fullPath: '/admin/produtos'
-      preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/pedidos-cancelados': {
-      id: '/_authenticated/admin/pedidos-cancelados'
-      path: '/pedidos-cancelados'
-      fullPath: '/admin/pedidos-cancelados'
-      preLoaderRoute: typeof AuthenticatedAdminPedidosCanceladosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/pedidos': {
-      id: '/_authenticated/admin/pedidos'
-      path: '/pedidos'
-      fullPath: '/admin/pedidos'
-      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/configuracoes': {
-      id: '/_authenticated/admin/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/clientes': {
-      id: '/_authenticated/admin/clientes'
-      path: '/clientes'
-      fullPath: '/admin/clientes'
-      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/categorias': {
-      id: '/_authenticated/admin/categorias'
-      path: '/categorias'
-      fullPath: '/admin/categorias'
-      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/administradores': {
@@ -390,12 +334,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAdministradoresRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/produtos/': {
-      id: '/_authenticated/admin/produtos/'
-      path: '/'
-      fullPath: '/admin/produtos/'
-      preLoaderRoute: typeof AuthenticatedAdminProdutosIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminProdutosRoute
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/pedidos': {
+      id: '/_authenticated/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/pedidos-cancelados': {
+      id: '/_authenticated/admin/pedidos-cancelados'
+      path: '/pedidos-cancelados'
+      fullPath: '/admin/pedidos-cancelados'
+      preLoaderRoute: typeof AuthenticatedAdminPedidosCanceladosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/produtos': {
+      id: '/_authenticated/admin/produtos'
+      path: '/produtos'
+      fullPath: '/admin/produtos'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/relatorios': {
+      id: '/_authenticated/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/zonas': {
+      id: '/_authenticated/admin/zonas'
+      path: '/zonas'
+      fullPath: '/admin/zonas'
+      preLoaderRoute: typeof AuthenticatedAdminZonasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/clientes/': {
       id: '/_authenticated/admin/clientes/'
@@ -404,19 +397,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesIndexRouteImport
       parentRoute: typeof AuthenticatedAdminClientesRoute
     }
-    '/_authenticated/admin/produtos/$categoryId': {
-      id: '/_authenticated/admin/produtos/$categoryId'
-      path: '/$categoryId'
-      fullPath: '/admin/produtos/$categoryId'
-      preLoaderRoute: typeof AuthenticatedAdminProdutosCategoryIdRouteImport
-      parentRoute: typeof AuthenticatedAdminProdutosRoute
-    }
     '/_authenticated/admin/clientes/$id': {
       id: '/_authenticated/admin/clientes/$id'
       path: '/$id'
       fullPath: '/admin/clientes/$id'
       preLoaderRoute: typeof AuthenticatedAdminClientesIdRouteImport
       parentRoute: typeof AuthenticatedAdminClientesRoute
+    }
+    '/_authenticated/admin/produtos/': {
+      id: '/_authenticated/admin/produtos/'
+      path: '/'
+      fullPath: '/admin/produtos/'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminProdutosRoute
+    }
+    '/_authenticated/admin/produtos/$categoryId': {
+      id: '/_authenticated/admin/produtos/$categoryId'
+      path: '/$categoryId'
+      fullPath: '/admin/produtos/$categoryId'
+      preLoaderRoute: typeof AuthenticatedAdminProdutosCategoryIdRouteImport
+      parentRoute: typeof AuthenticatedAdminProdutosRoute
     }
   }
 }
