@@ -45,7 +45,7 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
 type AdminClient = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 // Reads every page of auth users (listUsers returns one page at a time).
 async function listAllUsers(admin: AdminClient) {
-  const users: Awaited<ReturnType<AdminClient["auth"]["admin"]["listUsers"]>>["data"]["users"] = [];
+  const users: import("@supabase/supabase-js").User[] = [];
   const perPage = 1000;
   for (let page = 1; page < 1000; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
