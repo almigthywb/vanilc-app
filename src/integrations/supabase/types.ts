@@ -490,7 +490,51 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      settings_public: {
+        Row: {
+          address: string | null
+          banner_url: string | null
+          banner_url_desktop: string | null
+          banner_url_mobile: string | null
+          business_hours: string | null
+          delivery_fee_city: number | null
+          delivery_fee_outside: number | null
+          id: number | null
+          logo_url: string | null
+          prep_time_max: number | null
+          prep_time_min: number | null
+          store_open: boolean | null
+        }
+        Insert: {
+          address?: string | null
+          banner_url?: string | null
+          banner_url_desktop?: string | null
+          banner_url_mobile?: string | null
+          business_hours?: string | null
+          delivery_fee_city?: number | null
+          delivery_fee_outside?: number | null
+          id?: number | null
+          logo_url?: string | null
+          prep_time_max?: number | null
+          prep_time_min?: number | null
+          store_open?: boolean | null
+        }
+        Update: {
+          address?: string | null
+          banner_url?: string | null
+          banner_url_desktop?: string | null
+          banner_url_mobile?: string | null
+          business_hours?: string | null
+          delivery_fee_city?: number | null
+          delivery_fee_outside?: number | null
+          id?: number | null
+          logo_url?: string | null
+          prep_time_max?: number | null
+          prep_time_min?: number | null
+          store_open?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       normalize_phone: { Args: { p: string }; Returns: string }

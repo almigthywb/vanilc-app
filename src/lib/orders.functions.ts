@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+function fail(tag: string, err: unknown, message: string): Error {
+  console.error(`[${tag}]`, err);
+  return new Error(message);
+}
+
 // Only productId, qty and notes are trusted from the client; name/price come from the DB.
 const CartItemSchema = z.object({
   productId: z.string().uuid(),
@@ -105,7 +110,7 @@ export const createOrder = createServerFn({ method: "POST" })
         })
         .select("id")
         .single();
-      if (cErr) throw new Error(cErr.message);
+      if (cErr) throw fail("createOrder", cErr, "Não foi possível registar o seu pedido. Tente novamente.");
       customerId = inserted.id;
     }
 
@@ -131,7 +136,7 @@ export const createOrder = createServerFn({ method: "POST" })
       })
       .select("id, order_number")
       .single();
-    if (oErr) throw new Error(oErr.message);
+    if (oErr) throw fail("createOrder", oErr, "Não foi possível registar o seu pedido. Tente novamente.");
 
     // Insert items
     const itemsPayload = pricedItems.map((i) => ({
@@ -143,7 +148,7 @@ export const createOrder = createServerFn({ method: "POST" })
       notes: i.notes,
     }));
     const { error: iErr } = await supabase.from("order_items").insert(itemsPayload);
-    if (iErr) throw new Error(iErr.message);
+    if (iErr) throw fail("createOrder", iErr, "Não foi possível registar o seu pedido. Tente novamente.");
 
     return {
       orderId: order.id,

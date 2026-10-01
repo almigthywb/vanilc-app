@@ -1,5 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+
+function fail(tag: string, err: unknown, message: string): Error {
+  console.error(`[${tag}]`, err);
+  return new Error(message);
+}
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -25,16 +30,31 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
       .from("user_roles")
       .select("*", { count: "exact", head: true })
       .eq("role", "admin");
-    if (cErr) throw new Error(cErr.message);
+    if (cErr) throw fail("claimFirstAdmin", cErr, "Não foi possível concluir a configuração do administrador.");
     if ((count ?? 0) > 0) {
       return { granted: false, reason: "Já existe um administrador." };
     }
     const { error } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: context.userId, role: "admin" });
-    if (error) throw new Error(error.message);
+    if (error) throw fail("claimFirstAdmin", error, "Não foi possível concluir a configuração do administrador.");
     return { granted: true };
   });
+
+
+type AdminClient = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
+// Reads every page of auth users (listUsers returns one page at a time).
+async function listAllUsers(admin: AdminClient) {
+  const users: import("@supabase/supabase-js").User[] = [];
+  const perPage = 1000;
+  for (let page = 1; page < 1000; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) return { users, error };
+    users.push(...data.users);
+    if (data.users.length < perPage) break;
+  }
+  return { users, error: null };
+}
 
 const GrantAdmin = z.object({ email: z.string().email() });
 
@@ -44,7 +64,7 @@ const requireAdmin = async (supabase: SupabaseClient<Database>, userId: string) 
     .select("role")
     .eq("user_id", userId)
     .eq("role", "admin");
-  if (error) throw new Error(error.message);
+  if (error) throw fail("requireAdmin", error, "Não foi possível verificar as suas permissões.");
   if (!roles || roles.length === 0) throw new Error("Acesso negado.");
 };
 
@@ -81,8 +101,9 @@ export const grantAdminByEmail = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Look up user by email via admin API
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
-    if (lErr) throw new Error(lErr.message);
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
+    if (lErr) throw fail("grantAdminByEmail", lErr, "Não foi possível conceder acesso de administrador.");
     const target = list.users.find(
       (u) => (u.email ?? "").toLowerCase() === data.email.toLowerCase(),
     );
@@ -90,7 +111,7 @@ export const grantAdminByEmail = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: target.id, role: "admin" });
-    if (error) throw new Error(error.message);
+    if (error) throw fail("grantAdminByEmail", error, "Não foi possível conceder acesso de administrador.");
     return { granted: true };
   });
 
@@ -105,7 +126,7 @@ export const saveAdminProduct = createServerFn({ method: "POST" })
       ? supabaseAdmin.from("products").update(payload).eq("id", id)
       : supabaseAdmin.from("products").insert(payload);
     const { error } = await query;
-    if (error) throw new Error(error.message);
+    if (error) throw fail("saveAdminProduct", error, "Não foi possível guardar o produto.");
     return { ok: true };
   });
 
@@ -116,7 +137,7 @@ export const deleteAdminProduct = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("products").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw fail("deleteAdminProduct", error, "Não foi possível eliminar o produto.");
     return { ok: true };
   });
 
@@ -131,7 +152,7 @@ export const saveAdminCategory = createServerFn({ method: "POST" })
       ? supabaseAdmin.from("categories").update(payload).eq("id", id)
       : supabaseAdmin.from("categories").insert(payload);
     const { error } = await query;
-    if (error) throw new Error(error.message);
+    if (error) throw fail("saveAdminCategory", error, "Não foi possível guardar a categoria.");
     return { ok: true };
   });
 
@@ -142,7 +163,7 @@ export const deleteAdminCategory = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("categories").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw fail("deleteAdminCategory", error, "Não foi possível eliminar a categoria.");
     return { ok: true };
   });
 
@@ -167,7 +188,7 @@ export const reorderAdminProducts = createServerFn({ method: "POST" })
         .from("products")
         .update({ sort_order: item.sort_order })
         .eq("id", item.id);
-      if (error) throw new Error(error.message);
+      if (error) throw fail("reorderAdminProducts", error, "Não foi possível reordenar os produtos.");
     }
     return { ok: true };
   });
@@ -183,7 +204,7 @@ export const uploadAdminMedia = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.storage
       .from("vanilc-media")
       .upload(safePath, bytes, { upsert: true, contentType: data.contentType });
-    if (error) throw new Error(error.message);
+    if (error) throw fail("uploadAdminMedia", error, "Não foi possível enviar a imagem.");
     const { data: pub } = supabaseAdmin.storage.from("vanilc-media").getPublicUrl(safePath);
     return { publicUrl: pub.publicUrl };
   });
@@ -204,9 +225,10 @@ export const listAdmins = createServerFn({ method: "GET" })
       .from("user_roles")
       .select("id, user_id, created_at, created_by")
       .eq("role", "admin");
-    if (error) throw new Error(error.message);
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
-    if (lErr) throw new Error(lErr.message);
+    if (error) throw fail("listAdmins", error, "Não foi possível carregar os administradores.");
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
+    if (lErr) throw fail("listAdmins", lErr, "Não foi possível carregar os administradores.");
     const byId = new Map(list.users.map((u) => [u.id, u]));
     const admins = (roles ?? []).map((r) => {
       const u = byId.get(r.user_id);
@@ -231,8 +253,9 @@ export const createAdmin = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: list, error: lErr } = await supabaseAdmin.auth.admin.listUsers();
-    if (lErr) throw new Error(lErr.message);
+    const { users: allUsers, error: lErr } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
+    if (lErr) throw fail("createAdmin", lErr, "Não foi possível criar o administrador.");
     const existing = list.users.find(
       (u) => (u.email ?? "").toLowerCase() === data.email.toLowerCase(),
     );
@@ -254,14 +277,14 @@ export const createAdmin = createServerFn({ method: "POST" })
         password: data.password,
         email_confirm: true,
       });
-      if (cErr) throw new Error(cErr.message);
+      if (cErr) throw fail("createAdmin", cErr, "Não foi possível criar o administrador.");
       targetId = created.user.id;
     }
 
     const { error: rErr } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: targetId, role: "admin", created_by: context.userId });
-    if (rErr) throw new Error(rErr.message);
+    if (rErr) throw fail("createAdmin", rErr, "Não foi possível criar o administrador.");
 
     await supabaseAdmin.from("admin_audit_log").insert({
       actor_id: context.userId,
@@ -286,13 +309,14 @@ export const removeAdmin = createServerFn({ method: "POST" })
       .from("user_roles")
       .select("*", { count: "exact", head: true })
       .eq("role", "admin");
-    if (cErr) throw new Error(cErr.message);
+    if (cErr) throw fail("removeAdmin", cErr, "Não foi possível remover o administrador.");
     if ((count ?? 0) <= 1) {
       throw new Error("Deve existir pelo menos um administrador ativo.");
     }
 
     let targetEmail: string | null = null;
-    const { data: list } = await supabaseAdmin.auth.admin.listUsers();
+    const { users: allUsers } = await listAllUsers(supabaseAdmin);
+    const list = { users: allUsers };
     targetEmail = list?.users.find((u) => u.id === data.userId)?.email ?? null;
 
     const { error } = await supabaseAdmin
@@ -300,7 +324,7 @@ export const removeAdmin = createServerFn({ method: "POST" })
       .delete()
       .eq("user_id", data.userId)
       .eq("role", "admin");
-    if (error) throw new Error(error.message);
+    if (error) throw fail("removeAdmin", error, "Não foi possível remover o administrador.");
 
     await supabaseAdmin.from("admin_audit_log").insert({
       actor_id: context.userId,
@@ -330,7 +354,7 @@ export const saveDeliveryZone = createServerFn({ method: "POST" })
     const { id, ...rest } = data;
     if (id) {
       const { error } = await supabaseAdmin.from("delivery_zones").update(rest).eq("id", id);
-      if (error) throw new Error(error.message);
+      if (error) throw fail("saveDeliveryZone", error, "Não foi possível guardar a zona de entrega.");
     } else {
       const { data: last } = await supabaseAdmin
         .from("delivery_zones")
@@ -344,7 +368,7 @@ export const saveDeliveryZone = createServerFn({ method: "POST" })
         active: rest.active ?? true,
         display_order: (last?.display_order ?? 0) + 1,
       });
-      if (error) throw new Error(error.message);
+      if (error) throw fail("saveDeliveryZone", error, "Não foi possível guardar a zona de entrega.");
     }
     return { ok: true };
   });
@@ -356,7 +380,7 @@ export const deleteDeliveryZone = createServerFn({ method: "POST" })
     await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("delivery_zones").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw fail("deleteDeliveryZone", error, "Não foi possível eliminar a zona de entrega.");
     return { ok: true };
   });
 
@@ -373,7 +397,7 @@ export const reorderDeliveryZones = createServerFn({ method: "POST" })
         .from("delivery_zones")
         .update({ display_order: i + 1 })
         .eq("id", data.ids[i]);
-      if (error) throw new Error(error.message);
+      if (error) throw fail("reorderDeliveryZones", error, "Não foi possível reordenar as zonas de entrega.");
     }
     return { ok: true };
   });
